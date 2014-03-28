@@ -30,13 +30,9 @@ class BESConnection():
     def getREST(self, path='help'):
         response = self.get(path)
         
-        if 'content-type' in response.headers:
-            if response.headers['content-type'] == 'application/xml':
+        if ('content-type' in response.headers and 
+            response.headers['content-type'] == 'application/xml'):
                 return RESTResult(response.text)
-        elif type(response.text) is unicode:
-            return response.text
-        else:
-            return response.text
     
     def login(self):
         return bool(self.get('login').status_code == 200)
