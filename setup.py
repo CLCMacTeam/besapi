@@ -5,4 +5,7 @@ from distutils.core import setup
 setup(name='besapi',
       version='0.1',
       py_modules=['besapi'],
+      package_data={
+        'besapi': ['schemas/*.xsd'],
+      },
       )

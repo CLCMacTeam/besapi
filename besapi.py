@@ -13,6 +13,7 @@ import urlparse
 
 import requests
 from lxml import etree, objectify
+from pkg_resources import resource_filename
 
 class BESConnection():
  
@@ -47,7 +48,9 @@ class BESConnection():
             return False
         
         for xsd in ['BES.xsd', 'BESAPI.xsd', 'BESActionSettings.xsd']:
-            xmlschema_doc = etree.parse('schemas/' + xsd)
+            xmlschema_doc = etree.parse(
+                resource_filename(__name__, "schemas/%s" % xsd)
+            )
             xmlschema = etree.XMLSchema(xmlschema_doc)
             
             if xmlschema.validate(xmldoc):
