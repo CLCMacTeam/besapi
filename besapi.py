@@ -33,6 +33,27 @@ class BESConnection():
         if ('content-type' in response.headers and 
             response.headers['content-type'] == 'application/xml'):
                 return RESTResult(response.text)
+        elif type(response.text) is unicode:
+            if self.validateXSD(response.text.encode('utf-8')):
+                return RESTResult(response.text)
+        else:
+            if self.validateXSD(response.text):
+                return RESTResult(response.text)
+    
+    def validateXSD(self, doc):
+        try:
+            xmldoc = etree.fromstring(doc)
+        except:
+            return False
+        
+        for xsd in ['BES.xsd', 'BESAPI.xsd', 'BESActionSettings.xsd']:
+            xmlschema_doc = etree.parse('schemas/' + xsd)
+            xmlschema = etree.XMLSchema(xmlschema_doc)
+            
+            if xmlschema.validate(xmldoc):
+                return True
+                
+        return False
     
     def login(self):
         return bool(self.get('login').status_code == 200)
