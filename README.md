@@ -19,6 +19,7 @@ Usage:
     # rr.besobj contains the requested lxml.objectify.ObjectifiedElement
     
     >>>print rr
+```xml
     <BESAPI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BESAPI.xsd">
 	<ExternalSite Resource="http://bes.win.psu.edu:52311/api/site/external/BES%20Support">
 		<Name>BES Support</Name>
@@ -34,7 +35,7 @@ Usage:
 		<Name>ActionSite</Name>
 	</ActionSite>
     </BESAPI>
-    
+```
     >>>rr.besobj.attrib
     {'{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation': 'BESAPI.xsd'}
     
