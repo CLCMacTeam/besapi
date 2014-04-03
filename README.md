@@ -23,7 +23,7 @@ Usage:
 	<ExternalSite Resource="http://bes.win.psu.edu:52311/api/site/external/BES%20Support">
 		<Name>BES Support</Name>
 	</ExternalSite>
-	...
+	<!---...--->
    	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/SysManDev">
 	<Name>SysManDev</Name>
 	</CustomSite>
