@@ -8,4 +8,8 @@ setup(name='besapi',
       package_data={
         'besapi': ['schemas/*.xsd'],
       },
+      install_requires={
+        'requests',
+        'lxml',
+      },        
       )
