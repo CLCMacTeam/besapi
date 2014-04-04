@@ -25,8 +25,17 @@ Usage:
 		<Name>BES Support</Name>
 	</ExternalSite>
 	<!---...--->
+    <CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/PSU">
+		<Name>PSU</Name>
+	</CustomSite>
+	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/PSU%2fMac">
+		<Name>PSU/Mac</Name>
+	</CustomSite>
+	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/PSU%2fWindows">
+		<Name>PSU/Windows</Name>
+	</CustomSite>
    	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/SysManDev">
-	<Name>SysManDev</Name>
+    	<Name>SysManDev</Name>
 	</CustomSite>
 	<OperatorSite Resource="http://bes.win.psu.edu:52311/api/site/operator/mah60">
 		<Name>mah60</Name>
@@ -48,6 +57,16 @@ Usage:
     >>>rr.besobj.ActionSite.Name
     'ActionSite'
     
+    >>>rr.besobj.OperatorSite.Name
+    'mah60'
+    
+    >>>for cSite in rr.besobj.CustomSite:
+    ...     print cSite.Name
+    PSU
+    PSU/Mac
+    PSU/Windows
+    SysManDev
+    ...
     
 REST API Help
 ============
