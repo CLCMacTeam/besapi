@@ -20,12 +20,12 @@ Usage:
     
     >>>print rr
 ```xml
-    <BESAPI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BESAPI.xsd">
+	<BESAPI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BESAPI.xsd">
 	<ExternalSite Resource="http://bes.win.psu.edu:52311/api/site/external/BES%20Support">
 		<Name>BES Support</Name>
 	</ExternalSite>
 	<!---...--->
-    <CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/PSU">
+	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/PSU">
 		<Name>PSU</Name>
 	</CustomSite>
 	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/PSU%2fMac">
@@ -34,8 +34,8 @@ Usage:
 	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/PSU%2fWindows">
 		<Name>PSU/Windows</Name>
 	</CustomSite>
-   	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/SysManDev">
-    	<Name>SysManDev</Name>
+	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/SysManDev">
+		<Name>SysManDev</Name>
 	</CustomSite>
 	<OperatorSite Resource="http://bes.win.psu.edu:52311/api/site/operator/mah60">
 		<Name>mah60</Name>
@@ -43,7 +43,7 @@ Usage:
 	<ActionSite Resource="http://bes.win.psu.edu:52311/api/site/master">
 		<Name>ActionSite</Name>
 	</ActionSite>
-    </BESAPI>
+	</BESAPI>
 ```
     >>>rr.besobj.attrib
     {'{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation': 'BESAPI.xsd'}
