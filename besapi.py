@@ -9,7 +9,6 @@ Created by Matt Hansen (mah60@psu.edu) on 2014-03-20.
 
 Library for communicating with the BES (BigFix) REST API.
 """
-import urlparse
 
 import requests
 from lxml import etree, objectify
@@ -24,7 +23,10 @@ class BESConnection():
         self.session.auth = (username, password)
         
     def get(self, path='help'):
-        url = "%s/api/%s" % (self.rootserver, path)
+        if path.startswith(self.rootserver):
+            url = path
+        else:
+            url = "%s/api/%s" % (self.rootserver, path)
         
         return self.session.get(url, verify=False)
         
