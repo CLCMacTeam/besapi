@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='besapi',
-      version='0.2',
+      version='0.3',
       py_modules=['besapi'],
       package_data={
         'besapi': ['schemas/*.xsd'],

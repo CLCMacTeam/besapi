@@ -12,10 +12,11 @@ Usage:
     
     import besapi
     b = besapi.BESConnection('my_username', 'my_password', 'https://bes.win.psu.edu:52311')
-    rr = b.getREST('sites')
+    rr = b.get('sites')
     
-    # rr.bytearray contains the raw unicode byte array returned by the server
-    # rr.result contains the XML string converted from bytearray
+    # rr.request contains the original request object
+    # rr.text contains the raw request.text data returned by the server
+    # rr.besxml contains the XML string converted from the request.text
     # rr.besobj contains the requested lxml.objectify.ObjectifiedElement
     
     >>>print rr
