@@ -69,6 +69,16 @@ Usage:
     SysManDev
     ...
     
+    >>>rr = b.get('task/operator/mah60/823975')
+    >>>with open('/Users/Shared/Test.bes", "wb") as file:
+    ...     file.write(rr.text)
+    
+    >>>b.delete('task/operator/mah60/823975')
+    
+    >>> file = open('/Users/Shared/Test.bes')
+    >>> b.post('tasks/operator/mah60', file)
+    >>> b.put('task/operator/mah60/823975', file)
+    
 REST API Help
 ============
 http://bigfix.me/restapi
