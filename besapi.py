@@ -34,24 +34,24 @@ class BESConnection():
         
         return url
 
-    def get(self, path='help'):
+    def get(self, path='help', **kwargs):
         return RESTResult(self.session.get(self.url(path), 
-                            verify=self.verify))
+                            verify=self.verify, **kwargs))
         
-    def post(self, path, data):
+    def post(self, path, data, **kwargs):
     
         return RESTResult(self.session.post(self.url(path), 
-                            data=data, verify=self.verify))
+                            data=data, verify=self.verify, **kwargs))
     
-    def put(self, path, data):
+    def put(self, path, data, **kwargs):
         
         return RESTResult(self.session.put(self.url(path), 
-                            data=data, verify=self.verify))
+                            data=data, verify=self.verify, **kwargs))
     
-    def delete(self, path):
+    def delete(self, path, **kwargs):
     
         return RESTResult(self.session.delete(self.url(path), 
-                            verify=self.verify))
+                            verify=self.verify, **kwargs))
         
     def login(self):
         return bool(self.get('login').request.status_code == 200)
