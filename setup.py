@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+try:
+    from distutils.core import setup
+except:
+    from setuptools import setup
 
 setup(name='besapi',
       version='0.4',
