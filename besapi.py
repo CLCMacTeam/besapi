@@ -81,10 +81,10 @@ class RESTResult():
                 request.headers['content-type'] == 'application/xml'):
             self.valid = True
         elif (type(request.text) is unicode and
-              self.validateXSD(request.text.encode('utf-8'))):
+              self.validate_xsd(request.text.encode('utf-8'))):
             self.valid = True
         else:
-            if self.validateXSD(request.text):
+            if self.validate_xsd(request.text):
                 self.valid = True
             else:
                 self.valid = False
@@ -112,7 +112,7 @@ class RESTResult():
 
         return self._besobj
 
-    def validateXSD(self, doc):
+    def validate_xsd(self, doc):
         try:
             xmldoc = etree.fromstring(doc)
         except:
