@@ -9,10 +9,9 @@ setup(name='besapi',
       version='0.5',
       py_modules=['besapi'],
       package_data={
-        'besapi': ['schemas/*.xsd'],
+          'besapi': ['schemas/*.xsd'],
       },
       install_requires={
-        'requests',
-        'lxml',
-      },        
-      )
+          'requests',
+          'lxml',
+      },)
