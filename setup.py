@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 try:
-    from distutils.core import setup
-except:
     from setuptools import setup
+except:
+    from distutils.core import setup
 
 setup(name='besapi',
       version='0.5',
@@ -11,7 +11,7 @@ setup(name='besapi',
       package_data={
           'besapi': ['schemas/*.xsd'],
       },
-      install_requires={
+      install_requires=[
           'requests',
           'lxml',
-      },)
+      ],)
