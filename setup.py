@@ -6,7 +6,7 @@ except:
     from setuptools import setup
 
 setup(name='besapi',
-      version='0.4',
+      version='0.5',
       py_modules=['besapi'],
       package_data={
         'besapi': ['schemas/*.xsd'],
