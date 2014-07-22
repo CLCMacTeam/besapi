@@ -149,7 +149,8 @@ class RESTResult():
         return objectify.fromstring(root_xml)
 
 def main():
-    pass
+    import bescli
+    bescli.main()
 
 
 if __name__ == '__main__':
