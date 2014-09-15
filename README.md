@@ -36,7 +36,9 @@ If you have any questions on getting started we'd be happy to help. Or just let 
 Where can I find BigFix recipes?
 ----------
 
-Penn State currently has over 100 recipes for commonly used software. Unfortunately the recipes include many organization specific customizations, file paths and naming conventions. We are in the process of cleaning them up to share as well as adding support ways to make additional organization specific overrides.
+Penn State currently has over 100 BigFix recipes for commonly used software. Unfortunately, these recipes include many organization specific settings, file paths and naming conventions. We are in the process of cleaning up these recipes so they can be shared publicly.
+
+We are also working on making it easier to share recipes by adding more flexibility for using recipe overrides so organizations can add their own specific customizations but still take advantage of the shared recipes and to share their own.
 
 You can find example recipes under the "Examples" directory. If you'd like to work with us on getting a recipe for a specific piece of software or have any suggestions for making bigfix recipes easier to share please open an issue or send us an email at clcmac@psu.edu.
 
