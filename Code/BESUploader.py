@@ -14,6 +14,7 @@ AutoPkg Processor for uploading files using the BigFix REST API
 import os
 import urllib2
 import base64
+import sys
 from xml.dom import minidom
 
 from autopkglib import Processor, ProcessorError
@@ -21,26 +22,27 @@ from autopkglib import Processor, ProcessorError
 __all__ = ["BESUploader"]
 
 class BESUploader(Processor):
-    description = "Uploads a file to the BES Console. Requires Master Operator Rights!"
+    """AutoPkg Processor for uploading files using the BigFix REST API"""
+    description = "Uploads a file to the BES Console. Requires Master Operator."
     input_variables = {
         "bes_uploadpath": {
             "required": True,
-            "description": 
+            "description":
                 "Path to the file to import into the console."
         },
         "BES_ROOTSERVER": {
             "required": True,
-            "description": 
+            "description":
                 "URL to BES root server. e.g https://bes.domain.tld:52311/api"
         },
         "BES_USERNAME": {
             "required": True,
-            "description": 
+            "description":
                 "BES console username with upload permissions."
         },
         "BES_PASSWORD": {
             "required": True,
-            "description": 
+            "description":
                 "BES console password for bes_username."
         },
     }
@@ -67,8 +69,9 @@ class BESUploader(Processor):
         },
     }
     __doc__ = description
-    
+
     def send_api_request(self, api_url, auth_string, bes_file=None):
+        """Send generic BES API request"""
         request = urllib2.Request(api_url)
 
         request.add_header("Authorization", "Basic %s" % auth_string)
@@ -78,7 +81,8 @@ class BESUploader(Processor):
         if bes_file:
             bes_data = open(bes_file).read()
             request.add_data(bes_data)
-            request.add_header("Content-Disposition", 'attachment; filename="%s"' % 
+            request.add_header("Content-Disposition",
+                               'attachment; filename="%s"' %
                                os.path.basename(bes_file))
 
         # Request POST to Console API
@@ -93,46 +97,49 @@ class BESUploader(Processor):
             sys.exit(1)
 
     def main(self):
+        """BESUploader Main Method"""
         # Assign Console Variables
         bes_uploadpath = self.env.get("bes_uploadpath")
         BES_ROOTSERVER = self.env.get("BES_ROOTSERVER").encode('ascii')
         BES_USERNAME = self.env.get("BES_USERNAME")
         BES_PASSWORD = self.env.get("BES_PASSWORD")
-        
-        self.output("Uploading: %s to %s" % (bes_uploadpath, 
-                                             BES_ROOTSERVER + '/upload'))
-        
-        # Console Connection Strings
-        authString = base64.encodestring('%s:%s' %
-                                         (BES_USERNAME, BES_PASSWORD)).strip()
-        # Send Request
-        uploadRequest = self.send_api_request(BES_ROOTSERVER + "/upload",
-                                              authString, bes_uploadpath)
-        
-        #Read and Parse Console Return
-        resultDom = minidom.parseString(uploadRequest.read())
-        resultUpload = resultDom.getElementsByTagName('FileUpload') or []
-        resultName = resultUpload[-1].getElementsByTagName('Name')
-        resultURL = resultUpload[-1].getElementsByTagName('URL')
-        resultSize = resultUpload[-1].getElementsByTagName('Size')
-        resultSHA1 = resultUpload[-1].getElementsByTagName('SHA1')
-        
-        # Set Output Variables
-        self.env['bes_uploadname'] = resultName[-1].firstChild.nodeValue
-        self.env['bes_uploadurl'] = resultURL[-1].firstChild.nodeValue
-        self.env['bes_uploadsize'] = resultSize[-1].firstChild.nodeValue
-        self.env['bes_uploadsha1'] = resultSHA1[-1].firstChild.nodeValue
 
-        self.env['bes_prefetch'] = "prefetch %s sha1:%s size:%s %s" % (
-                                   self.env.get("bes_uploadname"),
-                                   self.env.get("bes_uploadsha1"),
-                                   self.env.get("bes_uploadsize"),
-                                   self.env.get("bes_uploadurl"),
+        self.output("Uploading: %s to %s" % (bes_uploadpath,
+                                             BES_ROOTSERVER + '/upload'))
+
+        # Console Connection Strings
+        auth_string = base64.encodestring('%s:%s' %
+                                          (BES_USERNAME, BES_PASSWORD)).strip()
+        # Send Request
+        upload_request = self.send_api_request(BES_ROOTSERVER + "/upload",
+                                               auth_string, bes_uploadpath)
+
+        #Read and Parse Console Return
+        result_dom = minidom.parseString(upload_request.read())
+        result_upload = result_dom.getElementsByTagName('FileUpload') or []
+        result_name = result_upload[-1].getElementsByTagName('Name')
+        result_url = result_upload[-1].getElementsByTagName('URL')
+        result_size = result_upload[-1].getElementsByTagName('Size')
+        result_sha1 = result_upload[-1].getElementsByTagName('SHA1')
+
+        # Set Output Variables
+        self.env['bes_uploadname'] = result_name[-1].firstChild.nodeValue
+        self.env['bes_uploadurl'] = result_url[-1].firstChild.nodeValue
+        self.env['bes_uploadsize'] = result_size[-1].firstChild.nodeValue
+        self.env['bes_uploadsha1'] = result_sha1[-1].firstChild.nodeValue
+
+        self.env['bes_prefetch'] = (
+            "prefetch %s sha1:%s size:%s %s" % (
+                self.env.get("bes_uploadname"),
+                self.env.get("bes_uploadsha1"),
+                self.env.get("bes_uploadsize"),
+                self.env.get("bes_uploadurl"),
+            )
         )
-        
+
         self.output("Result (%s): %s    " % (
-            uploadRequest.getcode(),
-            resultUpload[-1].attributes['Resource'].value))
+            upload_request.getcode(),
+            result_upload[-1].attributes['Resource'].value))
 
 if __name__ == "__main__":
     processor = BESUploader()
