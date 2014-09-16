@@ -1,7 +1,7 @@
 AutoPkg BESEngine
 =======
 
-AutoPkgBESEngine is a collection of shared processors for AutoPkg (https://github.com/autopkg/autopkg) used to automatically create and import software deployment tasks into a IBM Endpoint Manager console (http://www.ibm.com/software/tivoli/solutions/endpoint-manager/).
+AutoPkgBESEngine is a collection of shared processors for [AutoPkg](https://github.com/autopkg/autopkg) used to automatically create and import software deployment tasks into a [IBM Endpoint Manager](http://www.ibm.com/software/tivoli/solutions/endpoint-manager/) console.
 
 AutoPkgBESEngine.py     - AutoPkg Processor for BES (BigFix) XML Tasks and Fixlets
 
