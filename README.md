@@ -5,13 +5,13 @@ python-besapi is a Python library designed to interact with the BES (BigFix) RES
 
 Installation:
 
-    pip install -U -e git+https://stash.tlt.psu.edu:8443/scm/sys/besapi.git#egg=besapi
+    pip install -U -e git+https://github.com/CLCMacTeam/besapi/besapi.git#egg=besapi
 
 
 Usage:
     
     import besapi
-    b = besapi.BESConnection('my_username', 'my_password', 'https://bes.win.psu.edu:52311')
+    b = besapi.BESConnection('my_username', 'my_password', 'https://rootserver.domain.org:52311')
     rr = b.get('sites')
     
     # rr.request contains the original request object
@@ -22,26 +22,26 @@ Usage:
     >>>print rr
 ```xml
 <BESAPI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BESAPI.xsd">
-	<ExternalSite Resource="http://bes.win.psu.edu:52311/api/site/external/BES%20Support">
+	<ExternalSite Resource="http://rootserver.domain.org:52311/api/site/external/BES%20Support">
 		<Name>BES Support</Name>
 	</ExternalSite>
 	<!---...--->
-	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/PSU">
-		<Name>PSU</Name>
+	<CustomSite Resource="http://rootserver.domain.org:52311/api/site/custom/Org">
+		<Name>Org</Name>
 	</CustomSite>
-	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/PSU%2fMac">
-		<Name>PSU/Mac</Name>
+	<CustomSite Resource="http://rootserver.domain.org:52311/api/site/custom/Org%2fMac">
+		<Name>Org/Mac</Name>
 	</CustomSite>
-	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/PSU%2fWindows">
-		<Name>PSU/Windows</Name>
+	<CustomSite Resource="http://rootserver.domain.org:52311/api/site/custom/Org%2fWindows">
+		<Name>Org/Windows</Name>
 	</CustomSite>
-	<CustomSite Resource="http://bes.win.psu.edu:52311/api/site/custom/SysManDev">
-		<Name>SysManDev</Name>
+	<CustomSite Resource="http://rootserver.domain.org:52311/api/site/custom/ContentDev">
+		<Name>ContentDev</Name>
 	</CustomSite>
-	<OperatorSite Resource="http://bes.win.psu.edu:52311/api/site/operator/mah60">
+	<OperatorSite Resource="http://rootserver.domain.org:52311/api/site/operator/mah60">
 		<Name>mah60</Name>
 	</OperatorSite>
-	<ActionSite Resource="http://bes.win.psu.edu:52311/api/site/master">
+	<ActionSite Resource="http://rootserver.domain.org:52311/api/site/master">
 		<Name>ActionSite</Name>
 	</ActionSite>
 </BESAPI>
@@ -50,10 +50,10 @@ Usage:
     {'{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation': 'BESAPI.xsd'}
     
     >>>rr.besobj.ActionSite.attrib
-    {'Resource': 'http://bes.win.psu.edu:52311/api/site/master'}
+    {'Resource': 'http://rootserver.domain.org:52311/api/site/master'}
     
     >>>rr.besobj.ActionSite.attrib['Resource']
-    'http://bes.win.psu.edu:52311/api/site/master'
+    'http://rootserver.domain.org:52311/api/site/master'
     
     >>>rr.besobj.ActionSite.Name
     'ActionSite'
@@ -63,10 +63,10 @@ Usage:
     
     >>>for cSite in rr.besobj.CustomSite:
     ...     print cSite.Name
-    PSU
-    PSU/Mac
-    PSU/Windows
-    SysManDev
+    Org
+    Org/Mac
+    Org/Windows
+    ContentDev
     ...
     
     >>>rr = b.get('task/operator/mah60/823975')
