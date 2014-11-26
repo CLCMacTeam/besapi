@@ -217,12 +217,10 @@ class AutoPkgBESEngine(Processor):
                 output[line.split(':')[0].strip()] = line.split(':')[1].strip()
 
             if output.get('E', None):
-                self.output("Relevance Omitted: {%s} -- %s" %
+                self.output("Relevance Error: {%s} -- %s" %
                             (relevance,
                              output.get('E')))
-                return False
-            else:
-                return True
+            return True
         except Exception, error:
             self.output("Relevance Error: (%s) -- %s" % (QNA, error))
             return True
@@ -312,8 +310,8 @@ class AutoPkgBESEngine(Processor):
         # Append Relevance
         for line in bes_relevance:
             if os.path.isfile(QNA):
-                if self.validate_relevance(line):
-                    node.appendChild(self.new_node('Relevance', line))
+                self.validate_relevance(line)
+                node.appendChild(self.new_node('Relevance', line))
             else:
                 node.appendChild(self.new_node('Relevance', line))
 
