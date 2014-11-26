@@ -1,7 +1,7 @@
 AutoPkg BESEngine
 =======
 
-AutoPkgBESEngine is a collection of shared processors for AutoPkg (https://github.com/autopkg/autopkg) used to automatically create and import software deployment tasks into a IBM Endpoint Manager console (http://www.ibm.com/software/tivoli/solutions/endpoint-manager/).
+AutoPkgBESEngine is a collection of shared processors for [AutoPkg](https://github.com/autopkg/autopkg) used to automatically create and import software deployment tasks into a [IBM Endpoint Manager](http://www.ibm.com/software/tivoli/solutions/endpoint-manager/) console.
 
 AutoPkgBESEngine.py     - AutoPkg Processor for BES (BigFix) XML Tasks and Fixlets
 
@@ -18,9 +18,11 @@ Copy or symlink the BES processors (Code/*.py files) to /Library/AutoPkg/autopkg
 
 You can specify your BES console settings directly in the recipes or set them globally:
 
+```
 defaults write com.github.autopkg BES_ROOTSERVER yourBESRootServer
 defaults write com.github.autopkg BES_USERNAME yourAPIUserAccount
 defaults write com.github.autopkg BES_PASSWORD yourAPIUserAccountPassword
+```
 
 You must have a copy of QnA.app installed in /Applications/Utilities to use the BESRelevanceProvider processor.
 
