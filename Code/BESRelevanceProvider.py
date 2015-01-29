@@ -87,7 +87,7 @@ class BESRelevanceProvider(Processor):
 
             self.env['bes_sha1'] = hashlib.sha1(file(
                 bes_filepath).read()).hexdigest()
-            self.env['bes_size'] = os.path.getsize(bes_filepath)
+            self.env['bes_size'] = str(os.path.getsize(bes_filepath))
             self.env['bes_sha1_short'] = str(self.env.get("bes_sha1"))[-5:]
 
         self.output("bes_sha1 = %s, bes_size = %s, bes_sha1_short = %s" %
