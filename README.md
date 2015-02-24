@@ -49,7 +49,7 @@ Known Issues
 
 - AutoPkgBESEngine only supports the generation of a single prefetch item, but additional prefetch lines can be hardcoded into the recipes.
 
-- BESUloader requires a master operator account. Please vote for this IBM RFE - http://www.ibm.com/developerworks/rfe/execute?use_case=viewRfe&CR_ID=41378
+- BESUploader requires a master operator account. Please vote for this IBM RFE - http://www.ibm.com/developerworks/rfe/execute?use_case=viewRfe&CR_ID=41378
 
 - BESRelevanceProvider only supports a single relevance statement and stores the return value in a statically named variable.
 
