@@ -13,7 +13,6 @@ AutoPkg Processor for retreiving relevance data for tasks.
 
 import os
 import hashlib
-import sys
 import subprocess
 
 from autopkglib import Processor, ProcessorError
@@ -35,6 +34,11 @@ class BESRelevanceProvider(Processor):
             "description":
                 "A line of relevance to evaluate in QnA and return the result."
         },
+        "output_var_name": {
+            "required": False,
+            "description":
+                "Output variable name. Defaults to 'bes_relevance_result'"
+        },
     }
     output_variables = {
         "bes_sha1": {
@@ -49,14 +53,11 @@ class BESRelevanceProvider(Processor):
             "description":
                 "The resulting file size of the %bes_filepath%."
         },
-        "bes_relevance_result": {
-            "description":
-                "The result of the relevance expression, if provided."
-        },
     }
     __doc__ = description
 
     def eval_relevance(self, relevance):
+        # Evaluate Relevance Expression
         try:
             proc = subprocess.Popen(QNA, bufsize=-1,
                                     stdin=subprocess.PIPE,
@@ -96,7 +97,13 @@ class BESRelevanceProvider(Processor):
                      self.env.get("bes_sha1_short")))
 
         if bes_relevance:
-            self.env['bes_relevance_result'] = self.eval_relevance(bes_relevance)
+            output_var_name = self.env.get("output_var_name", 
+                                           "bes_relevance_result")
+
+            self.env[output_var_name] = self.eval_relevance(bes_relevance)
+            self.output("%s = %s" %
+                        (output_var_name,
+                         self.env.get(output_var_name)))
 
 if __name__ == "__main__":
     processor = BESRelevanceProvider()
