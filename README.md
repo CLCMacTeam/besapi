@@ -13,6 +13,14 @@ BESRelevanceProvider.py - AutoPkg Processor for retreiving relevance data for ta
 
 Installation
 ------------
+***The easy way...***
+
+```
+autopkg repo-add https://github.com/autopkg/hansen-m-recipes.git
+autopkg run BESEngine.install
+```
+
+***The hard way...***
 
 Copy or symlink the BES processors (Code/*.py files) to /Library/AutoPkg/autopkglib.
 
