@@ -23,7 +23,7 @@ from autopkglib import Processor, ProcessorError
 from collections import OrderedDict
 
 __all__ = ["AutoPkgBESEngine"]
-__version__ = '0.30'
+__version__ = '0.31'
 
 QNA = '/Applications/Utilities/QnA.app/Contents/Resources/QnA'
 
