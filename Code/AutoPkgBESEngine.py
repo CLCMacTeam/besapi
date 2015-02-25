@@ -266,11 +266,18 @@ class AutoPkgBESEngine(Processor):
                                        'ActionNumber': 'Action1',
                                        'ActionScript': """"""}})
 
+        bes_preactionscript = self.env.get("bes_preactionscript", "")
+        bes_postactionscript = self.env.get("bes_postactionscript", "")
+
         # Prepend prefetch line to action script for all actions
+        # Prepend and append pre and post actionscript additions
         for action in bes_actions:
-            bes_actions[action]['ActionScript'] = (
-                bes_prefetch + bes_actions[action]['ActionScript']
-            )
+            bes_actions[action]['ActionScript'] = ("%s\n%s%s\n%s" % (
+                bes_preactionscript,
+                bes_prefetch,
+                bes_actions[action]['ActionScript'],
+                bes_postactionscript
+            )).strip()
 
         # Additional Metadata for Task
         details = OrderedDict((
