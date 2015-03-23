@@ -82,8 +82,13 @@ Usage:
 Command-Line Interface
 ============
 ```
+$ python bescli.py
+	OR
+>>> import bescli
+>>> bescli.main()
+
 BES> login
-User [bfadmin]: username
+User [mah60]: username
 Root Server (ex. https://server.institution.edu:52311): https://my.company.org:52311
 Password: 
 Login Successful!
