@@ -93,19 +93,22 @@ class BESCLInterface(Cmd):
         else:
             root_server = raw_input("Root Server (ex. %s): " % 
                                     'https://server.institution.edu:52311')
-            if not root_server:
-                root_server = self.BES_ROOT_SERVER
-            
-            self.BES_ROOT_SERVER = root_server
+            if root_server:
+                self.BES_ROOT_SERVER = root_server
+            else:
+                self.BES_ROOT_SERVER = None
 
-        self.bes_conn = besapi.BESConnection(user,
-                                             getpass.getpass(),
-                                             root_server)
-        if self.bes_conn.login():
-            print "Login Successful!"
+        if self.BES_USER_NAME and self.BES_ROOT_SERVER:
+            self.bes_conn = besapi.BESConnection(user,
+                                                getpass.getpass(),
+                                                root_server)
+            if self.bes_conn.login():            
+                print "Login Successful!"
+            else:
+                print "Login Failed!"
+                self.bes_conn = None
         else:
-            print "Login Failed!"
-            self.bes_conn = None
+            print "Login Error!"
             
     def do_logout(self, arg):
 
