@@ -78,7 +78,21 @@ Usage:
     >>> file = open('/Users/Shared/Test.bes')
     >>> b.post('tasks/operator/mah60', file)
     >>> b.put('task/operator/mah60/823975', file)
-    
+
+Command-Line Interface
+============
+```
+BES> login
+User [bfadmin]: username
+Root Server (ex. https://server.institution.edu:52311): https://my.company.org:52311
+Password: 
+Login Successful!
+BES> get help
+...
+BES> get sites
+...
+```
+
 REST API Help
 ============
 http://bigfix.me/restapi
