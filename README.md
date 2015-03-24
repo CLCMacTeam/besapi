@@ -88,7 +88,7 @@ $ python bescli.py
 >>> bescli.main()
 
 BES> login
-User [mah60]: username
+User [mah60]: mah60
 Root Server (ex. https://server.institution.edu:52311): https://my.company.org:52311
 Password: 
 Login Successful!
@@ -96,6 +96,8 @@ BES> get help
 ...
 BES> get sites
 ...
+BES> get sites.OperatorSite.Name
+mah60
 ```
 
 REST API Help
