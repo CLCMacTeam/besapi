@@ -98,6 +98,13 @@ BES> get sites
 ...
 BES> get sites.OperatorSite.Name
 mah60
+BES> get help/fixlets
+GET:
+	/api/fixlets/{site}
+POST:
+	/api/fixlets/{site}
+BES> get fixlets/operator/mah60
+...
 ```
 
 REST API Help
