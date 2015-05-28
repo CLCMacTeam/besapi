@@ -1,0 +1,4 @@
+[besapi]
+BES_ROOT_SERVER = https://bigfix.organization.tld:52311
+BES_USER_NAME = username
+BES_PASSWORD = password
