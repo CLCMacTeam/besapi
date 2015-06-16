@@ -122,5 +122,5 @@ Requirements
 
 LICENSE
 =======
-Copyright (c) 2014, The Pennsylvania State University
-All rights reserved.
+Copyright (c) 2015, The Pennsylvania State University
+GNU GENERAL PUBLIC LICENSE v2
