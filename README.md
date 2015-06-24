@@ -1,7 +1,7 @@
 python-besapi
 ======
 
-python-besapi is a Python library designed to interact with the BES (BigFix) REST API.
+python-besapi is a Python library designed to interact with the BES (BigFix) [REST API](https://www.ibm.com/developerworks/community/wikis/home?lang=en#!/wiki/Tivoli%20Endpoint%20Manager/page/RESTAPI%20Action).
 
 Installation:
 
