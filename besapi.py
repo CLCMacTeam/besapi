@@ -11,6 +11,10 @@ Library for communicating with the BES (BigFix) REST API.
 """
 
 import requests
+# disable SSL warnings
+# http://stackoverflow.com/questions/27981545/suppress-insecurerequestwarning-unverified-https-request-is-being-made-in-pytho
+requests.packages.urllib3.disable_warnings()
+
 from lxml import etree, objectify
 from pkg_resources import resource_filename
 
