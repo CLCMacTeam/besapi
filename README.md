@@ -18,8 +18,9 @@ rr = b.get('sites')
 # rr.text contains the raw request.text data returned by the server
 # rr.besxml contains the XML string converted from the request.text
 # rr.besobj contains the requested lxml.objectify.ObjectifiedElement
-```
+
 >>>print rr
+```
 ```xml
 <BESAPI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BESAPI.xsd">
 <ExternalSite Resource="http://rootserver.domain.org:52311/api/site/external/BES%20Support">
@@ -45,6 +46,7 @@ rr = b.get('sites')
 <Name>ActionSite</Name>
 </ActionSite>
 </BESAPI>
+```
 ```
 >>>rr.besobj.attrib
 {'{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation': 'BESAPI.xsd'}
@@ -78,7 +80,7 @@ ContentDev
 >>> file = open('/Users/Shared/Test.bes')
 >>> b.post('tasks/operator/mah60', file)
 >>> b.put('task/operator/mah60/823975', file)
-
+```
 Command-Line Interface
 ============
 ```
