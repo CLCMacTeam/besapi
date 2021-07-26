@@ -5,7 +5,7 @@ python-besapi is a Python library designed to interact with the BES (BigFix) [RE
 
 Installation:
 
-```pip install -U -e git+https://github.com/CLCMacTeam/besapi.git#egg=besapi```
+```pip install -U -e git+https://git.psu.edu/sysman/python-besapi.git#egg=besapi```
 
 
 Usage:
