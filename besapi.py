@@ -80,7 +80,7 @@ class RESTResult():
         if ('content-type' in request.headers and
                 request.headers['content-type'] == 'application/xml'):
             self.valid = True
-        elif (type(request.text) is unicode and
+        elif (type(request.text) is str and
               self.validate_xsd(request.text.encode('utf-8'))):
             self.valid = True
         else:
@@ -131,7 +131,7 @@ class RESTResult():
 
     def xmlparse_text(self, text):
 
-        if type(text) is unicode:
+        if type(text) is str:
             root_xml = etree.fromstring(text.encode('utf-8'))
         else:
             root_xml = text
@@ -141,7 +141,7 @@ class RESTResult():
 
     def objectify_text(self, text):
 
-        if type(text) is unicode:
+        if type(text) is str:
             root_xml = text.encode('utf-8')
         else:
             root_xml = text

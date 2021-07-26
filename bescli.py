@@ -40,11 +40,11 @@ class BESCLInterface(Cmd):
             if len(robjs) > 1:
                 b = self.bes_conn.get(robjs[0])
                 #print objectify.ObjectPath(robjs[1:])
-                print eval("b()." + '.'.join(robjs[1:]))
+                print(eval("b()." + '.'.join(robjs[1:])))
             else:
-                print self.bes_conn.get(line)
+                print(self.bes_conn.get(line))
         else:
-            print "Not currently logged in. Type 'login'."
+            print("Not currently logged in. Type 'login'.")
 
     def do_conf(self, conf_file):
         if conf_file:
@@ -67,9 +67,9 @@ class BESCLInterface(Cmd):
             self.bes_conn = besapi.BESConnection(self.BES_USER_NAME,
                                                  self.BES_PASSWORD,
                                                  self.BES_ROOT_SERVER)
-            if self.bes_conn.login(): print "Login Successful!" 
+            if self.bes_conn.login(): print("Login Successful!")
         else:
-            print "Login Failed!"
+            print("Login Failed!")
 
     def do_login(self, user):
     
@@ -103,12 +103,12 @@ class BESCLInterface(Cmd):
                                                 getpass.getpass(),
                                                 root_server)
             if self.bes_conn.login():            
-                print "Login Successful!"
+                print("Login Successful!")
             else:
-                print "Login Failed!"
+                print("Login Failed!")
                 self.bes_conn = None
         else:
-            print "Login Error!"
+            print("Login Error!")
             
     def do_logout(self, arg):
 
@@ -117,7 +117,7 @@ class BESCLInterface(Cmd):
             self.bes_conn = None
 
     def do_debug(self, setting):
-        print bool(setting)
+        print(bool(setting))
         self.debug = bool(setting)
         self.echo = bool(setting)
         self.quiet = bool(setting)
