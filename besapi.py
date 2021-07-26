@@ -17,6 +17,11 @@ from pkg_resources import resource_filename
 class BESConnection():
 
     def __init__(self, username, password, rootserver, verify=False):
+    
+        if not verify:
+            # disable SSL warnings
+            # http://stackoverflow.com/questions/27981545/suppress-insecurerequestwarning-unverified-https-request-is-being-made-in-pytho
+            requests.packages.urllib3.disable_warnings()
 
         self.session = requests.Session()
         self.session.auth = (username, password)

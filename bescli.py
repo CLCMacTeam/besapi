@@ -13,6 +13,7 @@ Simple command line interface for the BES (BigFix) REST API.
 import os
 import argparse
 import getpass
+import sys
 
 from cmd2 import Cmd
 try:
@@ -76,6 +77,9 @@ class BESCLInterface(Cmd):
             print("Login Failed!")
 
     def do_login(self, user):
+        # python3 hack:
+        if sys.version_info >= (3, 0):
+            raw_input = input
     
         if not user:
             if self.BES_USER_NAME:
