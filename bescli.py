@@ -37,9 +37,10 @@ class BESCLInterface(Cmd):
         self.BES_PASSWORD = None
         self.bes_conn = None
         
-        self.do_conf(None)
+        #self.do_conf(None)
 
     def do_get(self, line):
+        """Perform get request to BigFix server using provided api endpoint argument"""
         robjs = line.split('.')
         
         if self.bes_conn:
@@ -55,6 +56,7 @@ class BESCLInterface(Cmd):
             print("Not currently logged in. Type 'login'.")
 
     def do_conf(self, conf_file):
+        """Attempt to load config info from file and login"""
         if conf_file:
             config_path = conf_file
         else:
@@ -92,6 +94,7 @@ class BESCLInterface(Cmd):
             self.do_login()
 
     def do_login(self, user=None):
+        """Login to BigFix Server"""
         # python3 hack:
         if sys.version_info >= (3, 0):
             raw_input = input
@@ -134,17 +137,38 @@ class BESCLInterface(Cmd):
             print("Login Error!")
             
     def do_logout(self, arg):
-
+        """Logout and clear session"""
         if self.bes_conn:
             self.bes_conn.logout()
             self.bes_conn = None
 
     def do_debug(self, setting):
+        """Enable or Disable Debug Mode"""
         print(bool(setting))
         self.debug = bool(setting)
         self.echo = bool(setting)
         self.quiet = bool(setting)
         self.timing = bool(setting)
+
+    def do_clear(self, arg=None):
+        """clear current config and logout"""
+        if self.bes_conn:
+            self.bes_conn.logout()
+            self.bes_conn = None
+        self.BES_ROOT_SERVER = None
+        self.BES_USER_NAME = None
+        self.BES_PASSWORD = None
+
+    def do_ls(self, arg=None):
+        """List the current settings and connection status"""
+        print("BES_ROOT_SERVER: " + (self.BES_ROOT_SERVER if self.BES_ROOT_SERVER else ""))
+        print("  BES_USER_NAME: " + (self.BES_USER_NAME if self.BES_USER_NAME else ""))
+        print("Password Length: " + str(len(self.BES_PASSWORD if self.BES_PASSWORD else "")))
+        print("      Connected: " + str(bool(self.bes_conn)))
+
+    def do_exit(self, arg=None):
+        """Exit this application"""
+        exit(0)
 
 def main():
     BESCLInterface().cmdloop()
