@@ -25,6 +25,14 @@ class BESConnection():
 
         self.session = requests.Session()
         self.session.auth = (username, password)
+        
+        # if not provided, add on https://
+        if not rootserver.startswith("http"):
+            rootserver = "https://" + rootserver
+        # if port not provided, add on the default :52311
+        if not rootserver.count(":") == 2:
+            rootserver = rootserver + ":52311"
+
         self.rootserver = rootserver
         self.verify = verify
 
