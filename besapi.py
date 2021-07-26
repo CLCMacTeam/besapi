@@ -96,7 +96,10 @@ class RESTResult():
 
     def __str__(self):
         if self.valid:
-            return self.besxml
+            try:
+                return self.besxml.decode("utf-8")
+            except:
+                return self.besxml
         else:
             return self.text
 
