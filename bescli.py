@@ -67,8 +67,16 @@ class BESCLInterface(Cmd):
         
         if CONFPARSER:
         
-            self.BES_ROOT_SERVER = CONFPARSER.get('besapi', 'BES_ROOT_SERVER')
-            self.BES_USER_NAME = CONFPARSER.get('besapi', 'BES_USER_NAME')
+            try:
+                self.BES_ROOT_SERVER = CONFPARSER.get('besapi', 'BES_ROOT_SERVER')
+            except:
+                self.BES_ROOT_SERVER = None
+
+            try:
+                self.BES_USER_NAME = CONFPARSER.get('besapi', 'BES_USER_NAME')
+            except:
+                self.BES_USER_NAME = None
+
             try:
                 self.BES_PASSWORD = CONFPARSER.get('besapi', 'BES_PASSWORD')
             except:
