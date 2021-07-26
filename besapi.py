@@ -96,6 +96,7 @@ class RESTResult():
 
     def __str__(self):
         if self.valid:
+            # I think this is needed for python3 compatibility:
             try:
                 return self.besxml.decode("utf-8")
             except:
