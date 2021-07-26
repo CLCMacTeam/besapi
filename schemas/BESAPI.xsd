@@ -1,9 +1,20 @@
 <?xml version="1.0"?>
-<xs:schema id="BESAPI" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="qualified" elementFormDefault="qualified" version="PLATFORM_VERSION">
+<xs:schema id="BESAPI" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="qualified" elementFormDefault="qualified" version="10.0.3.66">
 
 	<xs:element name="BESAPI">
 		<xs:complexType>
 			<xs:choice maxOccurs="unbounded">
+
+				<xs:element name="ManualComputerGroup">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Name" type="xs:normalizedString"/>
+							<xs:element name="EvaluateOnClient" type="xs:boolean"/>
+							<xs:element name="ComputerID" type="xs:nonNegativeInteger" minOccurs="0" maxOccurs="unbounded"/>
+						</xs:sequence>
+						<xs:attribute name="Resource" type="xs:normalizedString"/>  
+					</xs:complexType>
+				</xs:element>
 
 				<xs:element name="Fixlet">
 					<xs:complexType>
@@ -29,6 +40,34 @@
 					</xs:complexType>
 				</xs:element>
 
+				<xs:element name="WebReports">
+					<xs:complexType>
+						<xs:sequence>
+				   			<xs:element name="URL" type="xs:normalizedString"/>
+			   			</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="WebReportsServers">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:complexType name="WebReports">
+								<xs:element name="URL" type="xs:normalizedString"/>
+								<xs:element name="ID" type="xs:nonNegativeInteger"/>
+								<xs:element name="Priority" type="xs:nonNegativeInteger"/>
+							</xs:complexType>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="WebReportsPriority">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Priority" type="xs:nonNegativeInteger" minOccurs="1" maxOccurs="1"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+
 				<xs:element name="ReplicationLink" type="ReplicationLinkType"/>
 
 				<xs:element name="Action">
@@ -49,6 +88,21 @@
 							<xs:element name="URL" type="xs:normalizedString"/>
 							<xs:element name="Size" type="xs:nonNegativeInteger"/>
 							<xs:element name="SHA1" type="xs:normalizedString"/>
+							<xs:element name="SHA256" type="xs:normalizedString"/>
+							<xs:element name="Available" type="xs:boolean"/>
+							<xs:element name="ReferenceID" type="xs:nonNegativeInteger" minOccurs="0"/>
+						</xs:sequence>
+						<xs:attribute name="Resource" type="xs:normalizedString"/> 
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="FileUploadReference">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ID" type="xs:nonNegativeInteger"/>
+							<xs:element name="UserID" type="xs:nonNegativeInteger" minOccurs="0"/>
+							<xs:element name="CreationTime" type="xs:normalizedString"/>
+							<xs:element name="IsPrivate" type="xs:boolean"/>
 						</xs:sequence>
 						<xs:attribute name="Resource" type="xs:normalizedString"/> 
 					</xs:complexType>
@@ -59,6 +113,7 @@
 						<xs:sequence>
 							<xs:element name="ActionID" type="xs:nonNegativeInteger"/>
 							<xs:element name="Status" type="xs:normalizedString"/>
+							<xs:element name="DateIssued" type="xs:normalizedString" minOccurs="0"/>
 							<xs:element name="Computer" type="ComputerResultType" minOccurs="0" maxOccurs="unbounded"/>
 							<xs:element name="MemberActionResult" minOccurs="0" maxOccurs="unbounded">
 								<xs:complexType>
@@ -84,6 +139,8 @@
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
+
+				<xs:element name="AnalysisProperty" type="AnalysisProperty" />
 
 				<xs:element name="AnalysisActivation">
 					<xs:complexType>
@@ -141,12 +198,22 @@
 					</xs:complexType>
 				</xs:element>
 
+				<xs:element name="SiteVersion">
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:nonNegativeInteger">
+								<xs:attribute name="LastModified" type="xs:normalizedString"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+
 				<xs:element name="Baseline">
 					<xs:complexType>
-						<xs:choice>
+						<xs:sequence>
 							<xs:element name="Name" type="xs:normalizedString"/>
 							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
-						</xs:choice>
+						</xs:sequence>
 						<xs:attribute name="Resource" type="xs:string"/>  
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
@@ -169,6 +236,21 @@
 								</xs:element>
 								<xs:element name="Setting" type="ComputerSetting" minOccurs="0" maxOccurs="unbounded"/>
 							</xs:choice>
+							<xs:element name="ManagementExtension" minOccurs="0" maxOccurs="unbounded">
+								<xs:choice minOccurs="0" maxOccurs="unbounded">
+									<xs:element name="Property" minOccurs="0" maxOccurs="unbounded">
+										<xs:complexType>
+											<xs:simpleContent>
+												<xs:extension base="xs:string">
+													<xs:attribute name="Type" type="ObjectName" use="required" />
+												</xs:extension>
+											</xs:simpleContent>
+										</xs:complexType>              
+									</xs:element>
+									<xs:element name="Setting" type="ComputerSetting" minOccurs="0" maxOccurs="unbounded"/>
+								</xs:choice>
+								<xs:attribute name="Type" type="xs:string"/>
+							</xs:element>
 						</xs:sequence>
 						<xs:attribute name="Resource" type="xs:string"/>  
 					</xs:complexType>
@@ -266,8 +348,9 @@
 						<xs:sequence>
 							<xs:element name="Name" type="xs:normalizedString"/>
 							<xs:element name="DisplayName" type="xs:normalizedString" minOccurs="0"/>
+							<xs:element name="GatherURL" type="xs:string" minOccurs="0" />
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:string" use="required"/>  
+						<xs:attribute name="Resource" type="xs:string" use="required"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
@@ -276,9 +359,21 @@
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="Name" type="xs:normalizedString"/>
-							<xs:element name="DisplayName" type="xs:normalizedString" minOccurs="0"/>						
+							<xs:element name="DisplayName" type="xs:normalizedString" minOccurs="0"/>
+							<xs:element name="GatherURL" type="xs:string" minOccurs="0" />
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:string" use="required"/>  
+						<xs:attribute name="Resource" type="xs:string" use="required"/>
+						<xs:attribute name="LastModified" type="xs:normalizedString"/>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="OperatorSite">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Name" type="xs:normalizedString"/>
+							<xs:element name="GatherURL" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+						<xs:attribute name="Resource" type="xs:string" use="required"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
@@ -287,11 +382,12 @@
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="Name" type="xs:normalizedString"/>
+							<xs:element name="GatherURL" type="xs:string" minOccurs="0" />
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString" use="required"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString" use="required"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
-				</xs:element>				
+				</xs:element>
 
 				<xs:element name="Role" type="Role"/>
 
@@ -346,14 +442,45 @@
 					</xs:complexType>
 				</xs:element>
 
+				<xs:element name="SAMLProvider">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>							
+							<xs:element name="Issuer" type="xs:normalizedString"/>
+							<xs:element name="EntryPoint" type="xs:normalizedString"/>
+							<xs:element name="IsDisabled" type="xs:boolean"/>
+							<xs:element name="SigningCertificate" type="xs:normalizedString"/>
+						</xs:sequence>
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
+					</xs:complexType>
+				</xs:element>
+
 				<xs:element name="ComputerMailboxFile">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="Name" type="xs:normalizedString" minOccurs="0"/>	
-							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>						
+							<xs:element name="Name" type="xs:normalizedString" minOccurs="0"/>
+							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 							<xs:element name="SHA1" type="xs:normalizedString" minOccurs="0"/>
 							<xs:element name="Size" type="xs:normalizedString" minOccurs="0"/>
 							<xs:element name="Timestamp" type="xs:normalizedString" minOccurs="0"/>
+							<xs:element name="ManagementExtension" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+								<xs:sequence>
+									<xs:element name="ComputerMailboxFile" minOccurs="1" maxOccurs="unbounded" >
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="Name" type="xs:normalizedString" minOccurs="0"/>
+												<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
+												<xs:element name="SHA1" type="xs:normalizedString" minOccurs="0"/>
+												<xs:element name="Size" type="xs:normalizedString" minOccurs="0"/>
+												<xs:element name="Timestamp" type="xs:normalizedString" minOccurs="0"/>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+								</xs:complexType>
+								<xs:attribute name="Type" type="xs:string"/>
+							</xs:element>
 						</xs:sequence>
 						<xs:attribute name="Resource" type="xs:normalizedString"/>
 					</xs:complexType>
@@ -391,7 +518,41 @@
 							</xs:choice>
 							<xs:element name="ActionLockExemptionURL" type="xs:normalizedString"  minOccurs="0" maxOccurs="1" />
 							<xs:element name="RequireFIPSCompliantCrypto" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+							<xs:element name="MinimumSupportedClient" type="xs:normalizedString" minOccurs="0" maxOccurs="1" />
 						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				
+				<xs:element name="ClientQuery">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ApplicabilityRelevance" type="xs:normalizedString" minOccurs="1" maxOccurs="1"/>
+							<xs:element name="QueryText" type="xs:normalizedString" minOccurs="1" maxOccurs="1" />
+							<xs:element name="UseClientContext" type="xs:boolean" minOccurs="0" />
+							<xs:element name="Target" type="BESClientQueryTarget" minOccurs="0" />
+						</xs:sequence>						
+					</xs:complexType>
+				</xs:element>
+				
+				<xs:element name="ClientQueryResults">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ReportingAgents" type="xs:nonNegativeInteger"/>
+							<xs:element name="TotalResults"    type="xs:nonNegativeInteger"/>
+							<xs:element name="QueryResult" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="ComputerID"    type="xs:nonNegativeInteger"   minOccurs="1"/>
+										<xs:element name="ComputerName"  type="xs:normalizedString"     minOccurs="1"/>
+										<xs:element name="SubQueryID"    type="xs:nonNegativeInteger"   minOccurs="1"/>
+										<xs:element name="IsFailure"     type="xs:boolean"              minOccurs="1"/>
+										<xs:element name="ResponseTime"  type="xs:normalizedString"     minOccurs="1"/>
+										<xs:element name="Result"        type="xs:normalizedString"     minOccurs="1"/>
+										<xs:element name="ErrorMessage"  type="xs:normalizedString"/>
+									</xs:sequence>						
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>						
 					</xs:complexType>
 				</xs:element>
 
@@ -399,9 +560,117 @@
 				<xs:element name="Warning" type="xs:string" minOccurs="0" maxOccurs="unbounded"/> 
 				<xs:element name="ComputerSetting" type="ComputerSetting" minOccurs="0" maxOccurs="1"/>
 
+				<xs:element name="Session">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Operator" type="ObjectName"/>
+							<xs:element name="UserID" type="xs:nonNegativeInteger"/>
+							<xs:element name="EffectivePermissions" type="EffectivePermissions"/>
+						</xs:sequence>
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="PushNotification">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Type" type="xs:normalizedString" minOccurs="1" maxOccurs="1"/>
+							<xs:element name="Payload" type="PushNotificationPayload" minOccurs="1" maxOccurs="1"/>
+							<xs:element name="ComputerID" type="xs:nonNegativeInteger" minOccurs="1" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="UnicastNotification">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Command" type="xs:normalizedString" minOccurs="1" maxOccurs="1"/>
+							<xs:element name="Arg1" type="xs:normalizedString" minOccurs="0" maxOccurs="1"/>
+							<xs:element name="Arg2" type="xs:normalizedString" minOccurs="0" maxOccurs="1"/>
+							<xs:element name="ComputerID" type="xs:nonNegativeInteger" minOccurs="1" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="RelaySiteRequestResult">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="RelayComputerID" type="xs:nonNegativeInteger"/>
+							<xs:element name="RelayMasterSite" type="RelaySite" minOccurs="0"/>
+							<xs:element name="RelayCustomSite" type="RelaySite" minOccurs="0" maxOccurs="unbounded"/>
+							<xs:element name="RelayOperatorSite" type="RelaySite" minOccurs="0" maxOccurs="unbounded"/>
+							<xs:element name="RelayExternalSite" type="RelaySite" minOccurs="0" maxOccurs="unbounded"/>
+						</xs:sequence>	
+					</xs:complexType>
+				</xs:element>
+
 			</xs:choice>
 		</xs:complexType>
 	</xs:element>
+
+	<xs:complexType name="RelaySite">
+		<xs:sequence>
+			<xs:element name="SiteName" type="xs:string"/>
+			<xs:element name="SiteVersionDiff" type="xs:nonNegativeInteger" minOccurs="0"/>
+			<xs:element name="SiteVersion" type="xs:nonNegativeInteger" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="InterfaceLogins">
+		<xs:sequence>
+			<xs:element name="Console" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="WebUI" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="API" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="Applications" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Name" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="EffectivePermissions">
+		<xs:sequence>
+			<xs:element name="MasterOperator" type="xs:boolean"/>
+			<xs:element name="CustomContent" type="xs:boolean"/>
+			<xs:element name="ShowOtherActions" type="xs:boolean"/>
+			<xs:element name="StopOtherActions" type="xs:boolean"/>
+			<xs:element name="CanCreateActions" type="xs:boolean"/>
+			<xs:element name="CanLock" type="xs:boolean"/>
+			<xs:element name="CanSendMultipleRefresh" type="xs:boolean"/>
+            <xs:element name="CanSubmitQueries" type="xs:boolean"/>
+			<xs:element name="PostActionBehaviorPrivilege">
+				<xs:simpleType>
+					 <xs:restriction base="xs:normalizedString">
+						 <xs:enumeration value="AllowRestartAndShutdown"/>
+						 <xs:enumeration value="AllowRestartOnly"/>            
+						 <xs:enumeration value="None"/>
+					</xs:restriction>
+				 </xs:simpleType>
+			 </xs:element>
+			<xs:element name="ActionScriptCommandsPrivilege">
+				<xs:simpleType>
+					 <xs:restriction base="xs:normalizedString">
+						 <xs:enumeration value="AllowRestartAndShutdown"/>
+						 <xs:enumeration value="AllowRestartOnly"/>            
+						 <xs:enumeration value="None"/>
+					</xs:restriction>
+				 </xs:simpleType>
+			 </xs:element>
+			<xs:element name="UnmanagedAssetPrivilege">
+				<xs:simpleType>
+					<xs:restriction base="xs:normalizedString">
+						<xs:enumeration value="ShowNone"/>
+						<xs:enumeration value="ScanPoint"/>
+						<xs:enumeration value="ShowAll"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="InterfaceLogins" type="InterfaceLogins" />
+		</xs:sequence>
+	</xs:complexType>
 
 	<xs:complexType name="ComputerResultType">
 		<xs:sequence>
@@ -415,11 +684,16 @@
 					</xs:simpleContent>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="ExitCode" type="xs:integer" minOccurs="0"/>
 			<xs:element name="ApplyCount" type="xs:nonNegativeInteger"/>
 			<xs:element name="RetryCount" type="xs:nonNegativeInteger"/>
 			<xs:element name="LineNumber" type="xs:nonNegativeInteger"/>
+			<xs:element name="StartTime" type="xs:normalizedString" minOccurs="0"/>
+			<xs:element name="EndTime" type="xs:normalizedString" minOccurs="0"/>
+			<xs:element name="Computer" type="ComputerResultType" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="ID" type="xs:nonNegativeInteger"/>
+		<xs:attribute name="Name" type="xs:normalizedString"/>
 	</xs:complexType>
 
 	<xs:complexType name="LDAPServer">
@@ -477,6 +751,29 @@
 			<xs:element name="MasterOperator" type="xs:boolean" minOccurs="0" />
 			<xs:element name="CustomContent" type="xs:boolean" minOccurs="0" />
 			<xs:element name="ShowOtherActions" type="xs:boolean" minOccurs="0" />
+			<xs:element name="StopOtherActions" type="xs:boolean" minOccurs="0" />
+			<xs:element name="CanCreateActions" type="xs:boolean" minOccurs="0" />
+			<xs:element name="PostActionBehaviorPrivilege" minOccurs="0">
+				<xs:simpleType>
+					 <xs:restriction base="xs:normalizedString">
+						 <xs:enumeration value="AllowRestartAndShutdown" />
+						 <xs:enumeration value="AllowRestartOnly" />            
+						 <xs:enumeration value="None" />
+					</xs:restriction>
+				 </xs:simpleType>
+			 </xs:element>
+			<xs:element name="ActionScriptCommandsPrivilege" minOccurs="0">
+				<xs:simpleType>
+					 <xs:restriction base="xs:normalizedString">
+						 <xs:enumeration value="AllowRestartAndShutdown" />
+						 <xs:enumeration value="AllowRestartOnly" />            
+						 <xs:enumeration value="None" />
+					</xs:restriction>
+				 </xs:simpleType>
+			 </xs:element>
+			<xs:element name="CanLock" type="xs:boolean" minOccurs="0" />
+			<xs:element name="CanSendMultipleRefresh" type="xs:boolean" minOccurs="0" />
+            <xs:element name="CanSubmitQueries" type="xs:boolean" minOccurs="0" />
 			<xs:element name="LoginPermission" minOccurs="0">
 				<xs:simpleType>
 					<xs:restriction base="xs:normalizedString">
@@ -495,10 +792,52 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
+			<xs:element name="InterfaceLogins" type="InterfaceLogins" minOccurs="0" />
 			<xs:element name="ApproverRoleID" type="xs:nonNegativeInteger" minOccurs="0"/>
+			<xs:element name="ComputerAssignments" type="DynamicTarget" minOccurs="0" />
 		</xs:sequence>
 		<xs:attribute name="Resource" type="xs:normalizedString"/>
-	</xs:complexType>	
+	</xs:complexType>
+
+	<xs:complexType name="DynamicTarget">
+		<xs:choice>
+			<xs:element name="AllComputers" />
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="ByActiveDirectory" type="ByActiveDirectory" />
+				<xs:element name="ByRetrievedProperties" type="ByRetrievedProperties" />
+				<xs:element name="ByGroup" type="ByGroup" />
+			</xs:choice>
+		</xs:choice>
+		<xs:attribute name="Match" fixed="Any" />
+	</xs:complexType>
+
+	<xs:complexType name="ByActiveDirectory">
+		<xs:sequence>
+			<xs:element name="DistinguishedName" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ByRetrievedProperties">
+		<xs:sequence>
+			<xs:element name="Property" type="Property" maxOccurs="unbounded" />
+			<xs:element name="Relevance" type="RelevanceString" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute name="Match" fixed="All" />
+	</xs:complexType>
+
+	<xs:complexType name="Property">
+		<xs:sequence>
+			<xs:element name="Value" type="xs:string" />
+		</xs:sequence>
+		<xs:attribute name="Name" type="xs:string" />
+		<xs:attribute name="Resource" type="xs:normalizedString" />
+	</xs:complexType>
+
+	<xs:complexType name="ByGroup">
+		<xs:attribute name="Name" type="xs:string" />
+		<xs:attribute name="Type" type="xs:string" />
+		<xs:attribute name="Resource" type="xs:normalizedString" />
+	</xs:complexType>
 
 	<xs:complexType name="Role">
 		<xs:sequence>
@@ -508,6 +847,29 @@
 			<xs:element name="MasterOperator" type="xs:boolean" minOccurs="0" />
 			<xs:element name="CustomContent" type="xs:boolean" minOccurs="0" />
 			<xs:element name="ShowOtherActions" type="xs:boolean" minOccurs="0" />
+			<xs:element name="StopOtherActions" type="xs:boolean" minOccurs="0" />
+			<xs:element name="CanCreateActions" type="xs:boolean" minOccurs="0" />
+			<xs:element name="PostActionBehaviorPrivilege" minOccurs="0">
+			    <xs:simpleType>
+					<xs:restriction base="xs:normalizedString">
+						<xs:enumeration value="AllowRestartAndShutdown" />
+						<xs:enumeration value="AllowRestartOnly" />
+						<xs:enumeration value="None" />
+					</xs:restriction>
+				</xs:simpleType>
+            </xs:element>
+            <xs:element name="ActionScriptCommandsPrivilege" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:normalizedString">
+                        <xs:enumeration value="AllowRestartAndShutdown" />
+                        <xs:enumeration value="AllowRestartOnly" />
+                        <xs:enumeration value="None" />
+                    </xs:restriction>
+                </xs:simpleType>
+        	</xs:element>
+			<xs:element name="CanSendMultipleRefresh" type="xs:boolean" minOccurs="0" />
+            <xs:element name="CanSubmitQueries" type="xs:boolean" minOccurs="0" />
+			<xs:element name="CanLock" type="xs:boolean" minOccurs="0" />
 			<xs:element name="UnmanagedAssetPrivilege" minOccurs="0" >
 				<xs:simpleType>
 					<xs:restriction base="xs:normalizedString">
@@ -517,9 +879,10 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
+			<xs:element name="InterfaceLogins" type="InterfaceLogins" minOccurs="0" />
 			<xs:element name="Operators" minOccurs="0">
 				<xs:complexType>
-					<xs:choice maxOccurs="unbounded">
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
 						<xs:element name="Explicit" type="xs:normalizedString"/>
 						<xs:element name="Inherited" type="xs:normalizedString"/>
 					</xs:choice>
@@ -562,6 +925,7 @@
 					</xs:choice>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="ComputerAssignments" type="DynamicTarget" minOccurs="0" />
 		</xs:sequence>
 		<xs:attribute name="Resource" type="xs:normalizedString"/>
 	</xs:complexType>
@@ -659,5 +1023,49 @@
 			<xs:enumeration value="Hidden" />
 		</xs:restriction>
 	</xs:simpleType>
+
+	<xs:complexType name="AnalysisProperty">
+		<xs:simpleContent>
+			<xs:extension base="RelevanceString">
+				<xs:attribute name="Resource" type="xs:normalizedString" />
+				<xs:attribute name="Name" type="xs:string" />
+				<xs:attribute name="ID" type="xs:positiveInteger" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="RelevanceString">
+	  <xs:simpleContent>
+	    <xs:extension base="xs:string" />
+	  </xs:simpleContent>
+	</xs:complexType>
+
+	<xs:simpleType name="PushNotificationPayload">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="255" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="BESClientQueryString">
+		<xs:restriction base="xs:normalizedString">
+			<xs:minLength value="1" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:complexType name="BESClientQueryTarget">
+		<xs:choice>
+			<xs:element name="ComputerName" type="xs:normalizedString" maxOccurs="unbounded" />
+			<xs:element name="ComputerID" type="xs:nonNegativeInteger" maxOccurs="unbounded" />
+			<xs:element name="CustomRelevance" type="xs:normalizedString" />
+			<xs:element name="ComputerGroup" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Name"     type="BESClientQueryString" minOccurs="1" />
+						<xs:element name="SiteName" type="BESClientQueryString" minOccurs="1" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
 
 </xs:schema>
