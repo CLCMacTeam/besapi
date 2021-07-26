@@ -48,7 +48,7 @@ class BESCLInterface(Cmd):
                 print(eval("b()." + '.'.join(robjs[1:])))
             else:
                 output_item = self.bes_conn.get(line)
-                print(type(output_item))
+                # print(type(output_item))
                 print(output_item)
         else:
             print("Not currently logged in. Type 'login'.")
