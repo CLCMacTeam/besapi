@@ -15,7 +15,11 @@ import argparse
 import getpass
 
 from cmd2 import Cmd
-from ConfigParser import SafeConfigParser
+try:
+    from ConfigParser import SafeConfigParser
+except:
+    from configparser import SafeConfigParser
+
 #from lxml import etree, objectify
 
 import besapi
