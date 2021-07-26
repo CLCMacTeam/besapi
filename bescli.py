@@ -31,12 +31,13 @@ class BESCLInterface(Cmd):
     def __init__(self, **kwargs):
         Cmd.__init__(self, **kwargs)
         self.prompt = 'BES> '
-        #self.do_conf(None)
         
         self.BES_ROOT_SERVER = None
         self.BES_USER_NAME = None
         self.BES_PASSWORD = None
         self.bes_conn = None
+        
+        self.do_conf(None)
 
     def do_get(self, line):
         robjs = line.split('.')
@@ -68,7 +69,10 @@ class BESCLInterface(Cmd):
         
             self.BES_ROOT_SERVER = CONFPARSER.get('besapi', 'BES_ROOT_SERVER')
             self.BES_USER_NAME = CONFPARSER.get('besapi', 'BES_USER_NAME')
-            self.BES_PASSWORD = CONFPARSER.get('besapi', 'BES_PASSWORD')
+            try:
+                self.BES_PASSWORD = CONFPARSER.get('besapi', 'BES_PASSWORD')
+            except:
+                self.BES_PASSWORD = None
 
         if self.BES_USER_NAME and self.BES_PASSWORD and self.BES_ROOT_SERVER:
             self.bes_conn = besapi.BESConnection(self.BES_USER_NAME,
@@ -76,9 +80,10 @@ class BESCLInterface(Cmd):
                                                  self.BES_ROOT_SERVER)
             if self.bes_conn.login(): print("Login Successful!")
         else:
-            print("Login Failed!")
+            # if any missing in config file, do interactive login:
+            self.do_login()
 
-    def do_login(self, user):
+    def do_login(self, user=None):
         # python3 hack:
         if sys.version_info >= (3, 0):
             raw_input = input

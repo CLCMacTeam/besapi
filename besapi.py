@@ -131,7 +131,12 @@ class RESTResult():
             xmlschema_doc = etree.parse(
                 resource_filename(__name__, "schemas/%s" % xsd)
             )
-            xmlschema = etree.XMLSchema(xmlschema_doc)
+            
+            # one schema may throw an error while another will validate
+            try:
+                xmlschema = etree.XMLSchema(xmlschema_doc)
+            except (etree.XMLSchemaParseError) as err:
+                continue
 
             if xmlschema.validate(xmldoc):
                 return True
