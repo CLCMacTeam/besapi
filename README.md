@@ -81,6 +81,8 @@ ContentDev
 >>> b.post('tasks/operator/mah60', file)
 >>> b.put('task/operator/mah60/823975', file)
 ```
+
+
 Command-Line Interface
 ============
 ```
@@ -109,10 +111,12 @@ BES> get fixlets/operator/mah60
 ...
 ```
 
+
 REST API Help
 ============
+- https://developer.bigfix.com/rest-api/
 - http://bigfix.me/restapi
-- https://www.ibm.com/developerworks/community/wikis/home?lang=en#!/wiki/Tivoli%20Endpoint%20Manager/page/RESTAPI%20Action
+
 
 Requirements
 ============
@@ -120,6 +124,17 @@ Requirements
 - Python 2.7 or later
 - lxml
 - requests
+- cmd2
+
+
+Related Items
+=======
+- https://forum.bigfix.com/t/rest-api-python-module/2170
+- https://gist.github.com/hansen-m/58667f370047af92f634
+- https://docs.google.com/presentation/d/1pME28wdjkzj9378py9QjFyMOyOHcamB6bk4k8z-c-r0/edit#slide=id.g69e753e75_039
+- https://forum.bigfix.com/t/bigfix-documentation-resources/12540
+- https://forum.bigfix.com/t/query-for-finding-who-deleted-tasks-fixlets/13668/6
+- https://forum.bigfix.com/t/rest-api-java-wrapper/12693
 
 
 LICENSE

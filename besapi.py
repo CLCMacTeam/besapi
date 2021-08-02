@@ -17,9 +17,22 @@ from pkg_resources import resource_filename
 class BESConnection():
 
     def __init__(self, username, password, rootserver, verify=False):
+    
+        if not verify:
+            # disable SSL warnings
+            # http://stackoverflow.com/questions/27981545/suppress-insecurerequestwarning-unverified-https-request-is-being-made-in-pytho
+            requests.packages.urllib3.disable_warnings()
 
         self.session = requests.Session()
         self.session.auth = (username, password)
+        
+        # if not provided, add on https://
+        if not rootserver.startswith("http"):
+            rootserver = "https://" + rootserver
+        # if port not provided, add on the default :52311
+        if not rootserver.count(":") == 2:
+            rootserver = rootserver + ":52311"
+
         self.rootserver = rootserver
         self.verify = verify
 
@@ -80,7 +93,7 @@ class RESTResult():
         if ('content-type' in request.headers and
                 request.headers['content-type'] == 'application/xml'):
             self.valid = True
-        elif (type(request.text) is unicode and
+        elif (type(request.text) is str and
               self.validate_xsd(request.text.encode('utf-8'))):
             self.valid = True
         else:
@@ -91,7 +104,11 @@ class RESTResult():
 
     def __str__(self):
         if self.valid:
-            return self.besxml
+            # I think this is needed for python3 compatibility:
+            try:
+                return self.besxml.decode("utf-8")
+            except:
+                return self.besxml
         else:
             return self.text
 
@@ -122,7 +139,12 @@ class RESTResult():
             xmlschema_doc = etree.parse(
                 resource_filename(__name__, "schemas/%s" % xsd)
             )
-            xmlschema = etree.XMLSchema(xmlschema_doc)
+            
+            # one schema may throw an error while another will validate
+            try:
+                xmlschema = etree.XMLSchema(xmlschema_doc)
+            except (etree.XMLSchemaParseError) as err:
+                continue
 
             if xmlschema.validate(xmldoc):
                 return True
@@ -131,7 +153,7 @@ class RESTResult():
 
     def xmlparse_text(self, text):
 
-        if type(text) is unicode:
+        if type(text) is str:
             root_xml = etree.fromstring(text.encode('utf-8'))
         else:
             root_xml = text
@@ -141,7 +163,7 @@ class RESTResult():
 
     def objectify_text(self, text):
 
-        if type(text) is unicode:
+        if type(text) is str:
             root_xml = text.encode('utf-8')
         else:
             root_xml = text

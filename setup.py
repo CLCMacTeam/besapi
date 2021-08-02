@@ -9,7 +9,7 @@ setup(name='besapi',
       version='0.6',
       author='Matt Hansen',
       author_email='hansen.m@psu.edu',
-      description="Library for working with the IBM BigFix REST API",
+      description="Library for working with the BigFix REST API",
       license="BSD",
       keywords="bigfix ibm iem tem rest",
       url="https://github.com/CLCMacTeam/besapi",
@@ -22,4 +22,5 @@ setup(name='besapi',
       install_requires=[
           'requests',
           'lxml',
-      ],)
+          'cmd2'
+    ],)
