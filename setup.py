@@ -10,7 +10,7 @@ except (ImportError, ModuleNotFoundError):
 
 setup(
     name="besapi",
-    version="0.7",
+    # version= moved to setup.cfg
     author="Matt Hansen",
     author_email="hansen.m@psu.edu",
     description="Library for working with the BigFix REST API",
