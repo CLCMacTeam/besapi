@@ -1,0 +1,51 @@
+---
+name: test_build
+
+on:
+  push:
+    paths:
+      - "**.py"
+      - "setup.cfg"
+      - "MANIFEST.in"
+      - "pyproject.toml"
+      - "requirements.txt"
+      - ".github/workflows/test_build.yaml"
+      - ".github/workflows/tag_and_release.yaml"
+  pull_request:
+    paths:
+      - "**.py"
+      - "setup.cfg"
+      - "MANIFEST.in"
+      - "pyproject.toml"
+      - "requirements.txt"
+      - ".github/workflows/test_build.yaml"
+      - ".github/workflows/tag_and_release.yaml"
+
+jobs:
+  test_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install requirements
+        run: if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Install build tools
+        run: pip install setuptools wheel build
+      - name: Run build
+        run: python3 -m build
+      - name: Get Wheel File Path
+        id: getwheelfile
+        shell: bash
+        run: echo "::set-output name=wheelfile::$(find "dist" -type f -name "*.whl")"
+      - name: Test pip install of wheel
+        shell: bash
+        run: pip install $(find "dist" -type f -name "*.whl")
+      - name: Test python import besapi
+        shell: bash
+        run: python -c "import besapi"
+      - name: Test python import bescli
+        shell: bash
+        run: python -c "import besapi"
