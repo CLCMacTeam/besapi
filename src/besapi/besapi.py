@@ -17,18 +17,18 @@ import requests
 from lxml import etree, objectify
 from pkg_resources import resource_filename
 
-class BESConnection():
 
+class BESConnection:
     def __init__(self, username, password, rootserver, verify=False):
-    
+
         if not verify:
             # disable SSL warnings
             # http://stackoverflow.com/questions/27981545/suppress-insecurerequestwarning-unverified-https-request-is-being-made-in-pytho
-            requests.packages.urllib3.disable_warnings()
+            requests.packages.urllib3.disable_warnings()  # pylint: disable=no-member
 
         self.session = requests.Session()
         self.session.auth = (username, password)
-        
+
         # if not provided, add on https://
         if not rootserver.startswith("http"):
             rootserver = "https://" + rootserver
@@ -40,7 +40,7 @@ class BESConnection():
         self.verify = verify
 
         if not self.login():
-            self.get('login').request.raise_for_status()
+            self.get("login").request.raise_for_status()
 
     def url(self, path):
         if path.startswith(self.rootserver):
@@ -50,33 +50,31 @@ class BESConnection():
 
         return url
 
-    def get(self, path='help', **kwargs):
-        return RESTResult(self.session.get(self.url(path),
-                                           verify=self.verify,
-                                           **kwargs))
+    def get(self, path="help", **kwargs):
+        return RESTResult(
+            self.session.get(self.url(path), verify=self.verify, **kwargs)
+        )
 
     def post(self, path, data, **kwargs):
 
-        return RESTResult(self.session.post(self.url(path),
-                                            data=data,
-                                            verify=self.verify,
-                                            **kwargs))
+        return RESTResult(
+            self.session.post(self.url(path), data=data, verify=self.verify, **kwargs)
+        )
 
     def put(self, path, data, **kwargs):
 
-        return RESTResult(self.session.put(self.url(path),
-                                           data=data,
-                                           verify=self.verify,
-                                           **kwargs))
+        return RESTResult(
+            self.session.put(self.url(path), data=data, verify=self.verify, **kwargs)
+        )
 
     def delete(self, path, **kwargs):
 
-        return RESTResult(self.session.delete(self.url(path),
-                                              verify=self.verify,
-                                              **kwargs))
+        return RESTResult(
+            self.session.delete(self.url(path), verify=self.verify, **kwargs)
+        )
 
     def login(self):
-        return bool(self.get('login').request.status_code == 200)
+        return bool(self.get("login").request.status_code == 200)
 
     def logout(self):
         self.session.auth = None
@@ -85,19 +83,22 @@ class BESConnection():
 
     __call__ = login
 
-class RESTResult():
 
+class RESTResult:
     def __init__(self, request):
         self.request = request
         self.text = request.text
         self._besxml = None
         self._besobj = None
 
-        if ('content-type' in request.headers and
-                request.headers['content-type'] == 'application/xml'):
+        if (
+            "content-type" in request.headers
+            and request.headers["content-type"] == "application/xml"
+        ):
             self.valid = True
-        elif (type(request.text) is str and
-              self.validate_xsd(request.text.encode('utf-8'))):
+        elif type(request.text) is str and self.validate_xsd(
+            request.text.encode("utf-8")
+        ):
             self.valid = True
         else:
             if self.validate_xsd(request.text):
@@ -138,15 +139,13 @@ class RESTResult():
         except:
             return False
 
-        for xsd in ['BES.xsd', 'BESAPI.xsd', 'BESActionSettings.xsd']:
-            xmlschema_doc = etree.parse(
-                resource_filename(__name__, "schemas/%s" % xsd)
-            )
-            
+        for xsd in ["BES.xsd", "BESAPI.xsd", "BESActionSettings.xsd"]:
+            xmlschema_doc = etree.parse(resource_filename(__name__, "schemas/%s" % xsd))
+
             # one schema may throw an error while another will validate
             try:
                 xmlschema = etree.XMLSchema(xmlschema_doc)
-            except (etree.XMLSchemaParseError) as err:
+            except etree.XMLSchemaParseError:
                 continue
 
             if xmlschema.validate(xmldoc):
@@ -157,30 +156,31 @@ class RESTResult():
     def xmlparse_text(self, text):
 
         if type(text) is str:
-            root_xml = etree.fromstring(text.encode('utf-8'))
+            root_xml = etree.fromstring(text.encode("utf-8"))
         else:
             root_xml = text
 
-        return etree.tostring(root_xml, encoding='utf-8',
-                              xml_declaration=True)
+        return etree.tostring(root_xml, encoding="utf-8", xml_declaration=True)
 
     def objectify_text(self, text):
 
         if type(text) is str:
-            root_xml = text.encode('utf-8')
+            root_xml = text.encode("utf-8")
         else:
             root_xml = text
 
         return objectify.fromstring(root_xml)
 
+
 def main():
+    # pylint: disable=import-outside-toplevel
     try:
         from bescli import bescli
-    except ImportError:
+    except (ImportError, ModuleNotFoundError):
         site.addsitedir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         from bescli import bescli
     bescli.main()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

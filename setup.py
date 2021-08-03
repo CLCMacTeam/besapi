@@ -1,8 +1,11 @@
 #!/usr/bin/env python
+"""
+file to configure python build and packaging for pip
+"""
 
 try:
     from setuptools import setup
-except:
+except (ImportError, ModuleNotFoundError):
     from distutils.core import setup
 
 setup(
@@ -18,7 +21,7 @@ setup(
         "python-besapi is a Python library designed to "
         "interact with the BES (BigFix) REST API."
     ),
-    packages=["besapi","bescli"],
+    packages=["besapi", "bescli"],
     package_data={
         "besapi": ["schemas/*.xsd"],
     },
