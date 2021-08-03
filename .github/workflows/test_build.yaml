@@ -43,3 +43,9 @@ jobs:
       - name: Test pip install of wheel
         shell: bash
         run: pip install $(find "dist" -type f -name "*.whl")
+      - name: Test python import besapi
+        shell: bash
+        run: python -c "import besapi"
+      - name: Test python import bescli
+        shell: bash
+        run: python -c "import besapi"
