@@ -1,0 +1,448 @@
+<?xml version="1.0"?>
+<xs:schema id="BESActionSettings" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="qualified" elementFormDefault="qualified">
+	<xs:element name="ActionSettings">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element	name="Settings"	type="ActionSettings" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="ActionSettings">
+		<xs:sequence>
+			<!-- begin pre-7.0 action options -->
+			<xs:element name="HasMessage"	minOccurs="0" type="xs:boolean" />
+			<xs:element name="Message" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group minOccurs="0"	ref="Message" />
+						<xs:element	name="ShowActionButton"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="ShowCancelButton"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="AllowPostponement" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="MaxPostponementInterval" type="ActionMessageMaxPostponementInterval" minOccurs="0" />
+						<xs:element	name="PostponementDeadlineOffset" type="TimeInterval" minOccurs="0" />
+						<xs:element	name="HasTimeout" type="xs:boolean"	minOccurs="0" />
+						<xs:element	name="TimeoutInterval" minOccurs="0" type="ActionMessageTimeInterval" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!-- end pre-7.0 action options -->
+			<xs:element name="ActionUITitle" minOccurs="0" type="xs:normalizedString" />
+			<xs:element name="PreActionShowUI" minOccurs="0" type="xs:boolean" />
+			<xs:element name="PreAction" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element	name="Text"	type="xs:string" minOccurs="0" />
+						<xs:element	name="AskToSaveWork" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="ShowActionButton"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="ShowCancelButton"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="DeadlineBehavior"	type="ActionDeadlineBehavior" minOccurs="0" />
+						<xs:element	name="DeadlineType"	minOccurs="0">
+							<xs:simpleType>
+								<xs:restriction	base="xs:string">
+									<xs:enumeration value="Interval" />
+									<xs:enumeration value="Absolute" />
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element	name="DeadlineInterval"	type="ActionMessageTimeInterval" minOccurs="0" />
+						<!--
+							Use DeadlineOffset to specify the pre-action deadline using GMT as the reference time.
+							Use DeadlineLocalOffset to specify the pre-action deadline using local time as the reference time.
+							
+							For example, suppose it's January 1, 12:00 local time and your time zone is GMT-8.
+							
+							"DeadlineOffset = 1 day, 2 hours" sets the deadline to Janary 2, 22:00.
+							"DeadlineLocalOffset = 1 day, 2 hours" sets the deadline to January 2, 14:00.
+							
+							You probably want to use DeadlineLocalOffset, which was added in 8.1 patch #2.
+						-->
+						<xs:choice>
+							<xs:element	name="DeadlineOffset" type="TimeInterval" minOccurs="0" />
+							<xs:element	name="DeadlineLocalOffset" type="TimeInterval" minOccurs="0" />
+						</xs:choice>
+						<xs:element	name="ShowConfirmation"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Confirmation"	type="xs:string" minOccurs="0" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="HasRunningMessage" type="xs:boolean" minOccurs="0" />
+			<xs:element name="RunningMessage"	minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element	name="Title" type="xs:string" minOccurs="0" />
+						<xs:element	name="Text"	type="xs:string" minOccurs="0" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="HasTimeRange" type="xs:boolean" minOccurs="0" />
+			<xs:element name="TimeRange" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element	name="StartTime" type="xs:time" minOccurs="0" />
+						<xs:element	name="EndTime" type="xs:time" minOccurs="0"	/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="HasStartTime" type="xs:boolean" minOccurs="0" />
+			<!--
+				Use StartDateTimeOffset to specify the start time using GMT as the reference time.
+				Use StartDateTimeLocalOffset to specify the start time using local time as the reference time.
+				
+				For example, suppose it's January 1, 12:00 local time and your time zone is GMT-8.
+				
+				"StartDateTimeOffset = 1 day, 2 hours" sets the start time to Janary 2, 22:00.
+				"StartDateTimeLocalOffset = 1 day, 2 hours" sets the start time to January 2, 14:00.
+				
+				You probably want to use StartDateTimeLocalOffset, which was added in 8.1 patch #2.
+			-->
+			<xs:choice>
+				<xs:element name="StartDateTimeOffset" type="TimeInterval" minOccurs="0" />
+				<xs:element name="StartDateTimeLocalOffset" type="TimeInterval" minOccurs="0" />
+			</xs:choice>
+			<xs:element name="HasEndTime"	type="xs:boolean" minOccurs="0" />
+			<!--
+				Use EndDateTimeOffset to specify the end time using GMT as the reference time.
+				Use EndDateTimeLocalOffset to specify the end time using local time as the reference time.
+				
+				For example, suppose it's January 1, 12:00 local time and your time zone is GMT-8.
+				
+				"EndDateTimeOffset = 1 day, 2 hours" sets the end time to Janary 2, 22:00.
+				"EndDateTimeLocalOffset = 1 day, 2 hours" sets the end time to January 2, 14:00.
+				
+				You probably want to use EndDateTimeLocalOffset, which was added in 8.1 patch #2.
+			-->
+			<xs:choice>
+				<xs:element name="EndDateTimeOffset" type="TimeInterval" minOccurs="0" />
+				<xs:element name="EndDateTimeLocalOffset" type="TimeInterval" minOccurs="0"/>
+			</xs:choice>
+			<xs:element name="HasDayOfWeekConstraint"	type="xs:boolean" minOccurs="0" />
+			<xs:element name="DayOfWeekConstraint" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element	name="Sun" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Mon" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Tue" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Wed" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Thu" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Fri" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Sat" type="xs:boolean" minOccurs="0" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="UseUTCTime" type="xs:boolean" minOccurs="0" />
+			<xs:element name="ActiveUserRequirement" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration	value="NoRequirement" />
+						<xs:enumeration	value="RequireUser" />
+						<xs:enumeration	value="RequireNoUser" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ActiveUserType" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration	value="AllUsers" />
+						<xs:enumeration	value="LocalUsers" />
+						<xs:enumeration	value="UsersOfGroups" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="UIGroupConstraints" minOccurs="0">
+				<xs:complexType>
+					<xs:choice maxOccurs="unbounded">
+						<xs:element	name="Win9xGroup" minOccurs="0" />
+						<xs:element	name="WinNTGroup" minOccurs="0" />
+						<xs:element	name="LocalGroup" minOccurs="0"	maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:attribute name="Name" type="xs:string" use="required" />
+							</xs:complexType>
+						</xs:element>
+						<xs:element	name="DomainGroup" minOccurs="0" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:attribute name="Name" type="xs:string" use="required" />
+								<xs:attribute name="Sid" type="xs:string" use="required" />
+							</xs:complexType>
+						</xs:element>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="HasWhose" type="xs:boolean" minOccurs="0" />
+			<xs:element name="Whose" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element	name="Property" type="xs:string" minOccurs="0" />
+						<xs:element	name="Relation" minOccurs="0">
+							<xs:simpleType>
+								<xs:restriction	base="xs:string" />
+							</xs:simpleType>
+						</xs:element>
+						<xs:element	name="Value" type="xs:string" minOccurs="0" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="PreActionCacheDownload" type="xs:boolean" minOccurs="0" />
+			<!--
+				 In 7.1 the reapply options in the Console UI were changed so that instead of a checkbox
+				 to indicate reapply interval, there are radio buttons indicating one of { PolicyReapply, PeriodicReapply }
+				 For backward compatibility, the XML for the options have stayed the same as before.  The mapping:
+				 NoReapply       - { Reapply = false }
+				 PolicyReapply   - { Reapply = true, HasReapplyInterval = false }
+				 PeriodicReapply - { Reapply = true, HasReapplyInterval = true }
+			-->
+			<xs:element name="Reapply" type="xs:boolean" minOccurs="0" />
+			<xs:element name="HasReapplyLimit" type="xs:boolean" minOccurs="0" />
+			<xs:element name="ReapplyLimit" type="xs:nonNegativeInteger" minOccurs="0" />
+			<xs:element name="HasReapplyInterval" type="xs:boolean" minOccurs="0" />
+			<xs:element name="ReapplyInterval" type="ActionReapplyInterval" minOccurs="0" />
+
+			<xs:element name="HasRetry" type="xs:boolean" minOccurs="0" />
+			<xs:element name="RetryCount" type="xs:nonNegativeInteger" minOccurs="0" />
+			<xs:element name="RetryWait" minOccurs="0">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="RetryWaitInterval">
+							<xs:attribute name="Behavior"	default="WaitForInterval">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration	value="WaitForReboot" />
+										<xs:enumeration	value="WaitForInterval" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="HasTemporalDistribution" type="xs:boolean" minOccurs="0" />
+			<xs:element name="TemporalDistribution" type="NonNegativeTimeInterval" minOccurs="0" />
+			<xs:element name="ContinueOnErrors" type="xs:boolean" minOccurs="0" />
+			<xs:element name="PostActionBehavior" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element	name="AllowCancel" type="xs:boolean" minOccurs="0" />
+						<!-- begin pre-7.0 action options -->
+						<xs:element	name="AllowPostponement" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="MaxPostponementInterval" type="ActionMessageMaxPostponementInterval" minOccurs="0" />
+						<xs:element	name="HasTimeout" type="xs:boolean"	minOccurs="0" />
+						<xs:element	name="TimeoutInterval" type="ActionMessageTimeInterval"	minOccurs="0" />
+						<!-- end pre-7.0 action	options	-->
+						<xs:element	name="PostActionDeadlineBehavior" type="ActionDeadlineBehavior"	minOccurs="0" />
+						<xs:element	name="PostActionDeadlineInterval" type="ActionMessageTimeInterval" minOccurs="0" />
+						<xs:group ref="Message"	/>
+					</xs:sequence>
+					<xs:attribute name="Behavior" default="Nothing">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration	value="Nothing" />
+								<xs:enumeration	value="Restart" />
+								<xs:enumeration	value="Shutdown" />
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="IsOffer" type="xs:boolean" minOccurs="0" />
+			<xs:element name="AnnounceOffer" type="xs:boolean" minOccurs="0" />
+			<xs:element name="OfferCategory" type="xs:string"	minOccurs="0" />
+			<xs:element name="OfferDescriptionHTML" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ActionSettingsLocks">
+		<xs:sequence>
+			<!-- begin pre-7.0 action options -->
+			<xs:element name="HasMessage"	type="xs:boolean" minOccurs="0"	/>
+			<xs:element name="Message" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group minOccurs="0"	ref="MessageLocks" />
+						<xs:element	name="ShowActionButton"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="ShowCancelButton"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Postponement"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Timeout" type="xs:boolean" minOccurs="0" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!-- end pre-7.0 action options -->
+			<xs:element name="ActionUITitle" type="xs:boolean" minOccurs="0" />
+			<xs:element name="PreActionShowUI" type="xs:boolean" minOccurs="0" />
+			<xs:element name="PreAction" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group minOccurs="0"	ref="MessageLocks" />
+						<xs:element	name="AskToSaveWork" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="ShowActionButton"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="ShowCancelButton"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="DeadlineBehavior"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="ShowConfirmation"	type="xs:boolean" minOccurs="0" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="HasRunningMessage" type="xs:boolean" minOccurs="0" />
+			<xs:element name="RunningMessage" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element	name="Title" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Text"	type="xs:boolean" minOccurs="0" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="TimeRange" type="xs:boolean" minOccurs="0" />
+			<xs:element name="StartDateTimeOffset" type="xs:boolean" minOccurs="0" />
+			<xs:element name="EndDateTimeOffset" type="xs:boolean" minOccurs="0" />
+			<xs:element name="DayOfWeekConstraint" type="xs:boolean" minOccurs="0" />
+			<xs:element name="ActiveUserRequirement" type="xs:boolean" minOccurs="0" />
+			<xs:element name="ActiveUserType"	type="xs:boolean" minOccurs="0"	/>
+			<xs:element name="Whose" type="xs:boolean" minOccurs="0" />
+
+			<xs:element name="PreActionCacheDownload" type="xs:boolean" minOccurs="0" />
+			<!-- 
+				 In 7.1 the reapply options in the Console UI were changed to a choice of { NoReapply, PolicyReapply, PeriodicReapply },
+				 where PeriodicReapply implies that a reapply interval exists.  The "ReapplyInterval" lock was removed because of this new organization.
+				 For backward-compatibility, if "ReapplyInterval" is locked, then "Reapply" will be locked.
+			-->
+			<xs:element name="Reapply" type="xs:boolean" minOccurs="0" />
+			<xs:element name="ReapplyLimit" type="xs:boolean" minOccurs="0" />
+			<xs:element name="ReapplyInterval" type="xs:boolean" minOccurs="0" />
+			<xs:element name="RetryCount" type="xs:boolean" minOccurs="0" />
+			<xs:element name="RetryWait" type="xs:boolean" minOccurs="0" />
+			<xs:element name="TemporalDistribution" type="xs:boolean" minOccurs="0" />
+			<xs:element name="ContinueOnErrors" type="xs:boolean" minOccurs="0" />
+			<xs:element name="PostActionBehavior"	minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element	name="Behavior"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="AllowCancel" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Postponement"	type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Timeout" type="xs:boolean" minOccurs="0" />
+						<xs:element	name="Deadline"	type="xs:boolean" minOccurs="0" />
+						<!-- Postponement and Timeout were BES pre-7.0 options that	were replaced with Deadline	-->
+						<xs:group ref="MessageLocks" minOccurs="0" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="IsOffer" type="xs:boolean" minOccurs="0" />
+			<xs:element name="AnnounceOffer" type="xs:boolean" minOccurs="0" />
+			<xs:element name="OfferTitle" type="xs:string" minOccurs="0" />
+			<xs:element name="OfferCategory" type="xs:string" minOccurs="0" />
+			<xs:element name="OfferDescriptionHTML" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="ActionReapplyInterval">
+		<xs:restriction	base="NonNegativeTimeInterval">
+			<xs:enumeration	value="PT15M" />
+			<xs:enumeration	value="PT30M" />
+			<xs:enumeration	value="PT1H" />
+			<xs:enumeration	value="PT2H" />
+			<xs:enumeration	value="PT4H" />
+			<xs:enumeration	value="PT6H" />
+			<xs:enumeration	value="PT8H" />
+			<xs:enumeration	value="PT12H" />
+			<xs:enumeration	value="P1D" />
+			<xs:enumeration	value="P2D" />
+			<xs:enumeration	value="P3D" />
+			<xs:enumeration	value="P5D" />
+			<xs:enumeration	value="P7D" />
+			<xs:enumeration	value="P15D" />
+			<xs:enumeration	value="P30D" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ActionMessageMaxPostponementInterval">
+		<xs:restriction	base="NonNegativeTimeInterval">
+			<xs:enumeration value="PT15M" />
+			<xs:enumeration value="PT30M" />
+			<xs:enumeration value="PT1H" />
+			<xs:enumeration value="PT2H" />
+			<xs:enumeration value="PT4H" />
+			<xs:enumeration value="PT6H" />
+			<xs:enumeration value="PT8H" />
+			<xs:enumeration value="PT12H" />
+			<xs:enumeration value="P1D" />
+			<xs:enumeration value="P2D" />
+			<xs:enumeration value="P3D" />
+			<xs:enumeration value="P5D" />
+			<xs:enumeration value="P7D" />
+			<xs:enumeration value="P15D" />
+			<xs:enumeration value="P30D" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ActionMessageTimeInterval">
+		<xs:restriction	base="NonNegativeTimeInterval">
+			<xs:enumeration value="PT1M" />
+			<xs:enumeration value="PT2M" />
+			<xs:enumeration value="PT3M" />
+			<xs:enumeration value="PT4M" />
+			<xs:enumeration value="PT5M" />
+			<xs:enumeration value="PT10M" />
+			<xs:enumeration value="PT15M" />
+			<xs:enumeration value="PT30M" />
+			<xs:enumeration value="PT1H" />
+			<xs:enumeration value="PT2H" />
+			<xs:enumeration value="PT4H" />
+			<xs:enumeration value="PT6H" />
+			<xs:enumeration value="PT8H" />
+			<xs:enumeration value="PT12H" />
+			<xs:enumeration value="P1D" />
+			<xs:enumeration value="P2D" />
+			<xs:enumeration value="P3D" />
+			<xs:enumeration value="P5D" />
+			<xs:enumeration value="P7D" />
+			<xs:enumeration value="P15D" />
+			<xs:enumeration value="P30D" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ActionDeadlineBehavior">
+		<xs:restriction	base="xs:string">
+			<xs:enumeration value="ForceToRun" />
+			<xs:enumeration value="RunAutomatically" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:group name="Message">
+		<xs:sequence>
+			<xs:element name="Title" type="xs:normalizedString" minOccurs="0" />
+			<xs:element name="Text" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="MessageLocks">
+		<xs:sequence>
+			<xs:element name="Title" type="xs:boolean" minOccurs="0" />
+			<xs:element name="Text" type="xs:boolean"	minOccurs="0" />
+		</xs:sequence>
+	</xs:group>
+	<xs:simpleType name="RetryWaitInterval">
+		<xs:restriction	base="NonNegativeTimeInterval">
+			<xs:enumeration value="PT10M" />
+			<xs:enumeration value="PT15M" />
+			<xs:enumeration value="PT30M" />
+			<xs:enumeration value="PT1H" />
+			<xs:enumeration value="PT2H" />
+			<xs:enumeration value="PT4H" />
+			<xs:enumeration value="PT6H" />
+			<xs:enumeration value="PT8H" />
+			<xs:enumeration value="PT12H" />
+			<xs:enumeration value="P1D" />
+			<xs:enumeration value="P2D" />
+			<xs:enumeration value="P3D" />
+			<xs:enumeration value="P5D" />
+			<xs:enumeration value="P7D" />
+			<xs:enumeration value="P15D" />
+			<xs:enumeration value="P30D" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TimeInterval">
+		<xs:restriction	base="xs:duration">
+			<xs:pattern value="\-?P([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+(\.[0-9]{1,6})?S)?)?" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NonNegativeTimeInterval">
+		<xs:restriction	base="xs:duration">
+			<xs:pattern value="P([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+(\.[0-9]{1,6})?S)?)?" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NonNegativeDate">
+		<xs:restriction	base="xs:date">
+			<xs:pattern value="\d{4}-\d{2}-\d{2}" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

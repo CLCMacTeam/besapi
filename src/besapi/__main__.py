@@ -1,7 +1,6 @@
 """
 To run this module directly
 """
-from . import bescli
-from . import besapi
+from bescli import bescli
 
 bescli.main()

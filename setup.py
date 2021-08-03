@@ -7,7 +7,7 @@ except:
 
 setup(
     name="besapi",
-    version="0.6",
+    version="0.7",
     author="Matt Hansen",
     author_email="hansen.m@psu.edu",
     description="Library for working with the BigFix REST API",
@@ -18,10 +18,11 @@ setup(
         "python-besapi is a Python library designed to "
         "interact with the BES (BigFix) REST API."
     ),
-    py_modules=["besapi", "bescli"],
+    packages=["besapi","bescli"],
     package_data={
         "besapi": ["schemas/*.xsd"],
     },
     install_requires=["requests", "lxml", "cmd2"],
     include_package_data=True,
+    package_dir={"": "src"},
 )

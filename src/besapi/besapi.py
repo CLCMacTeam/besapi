@@ -10,6 +10,9 @@ Created by Matt Hansen (mah60@psu.edu) on 2014-03-20.
 Library for communicating with the BES (BigFix) REST API.
 """
 
+import site
+import os.path
+
 import requests
 from lxml import etree, objectify
 from pkg_resources import resource_filename
@@ -171,7 +174,11 @@ class RESTResult():
         return objectify.fromstring(root_xml)
 
 def main():
-    import bescli
+    try:
+        from bescli import bescli
+    except ImportError:
+        site.addsitedir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from bescli import bescli
     bescli.main()
 
 

@@ -1,1 +1,1 @@
-include schemas/*.xsd
+include src/besapi/schemas/*.xsd

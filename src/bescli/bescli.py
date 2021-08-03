@@ -14,6 +14,7 @@ import os
 import argparse
 import getpass
 import sys
+import site
 
 from cmd2 import Cmd
 try:
@@ -23,7 +24,15 @@ except:
 
 #from lxml import etree, objectify
 
-import besapi
+try:
+    from besapi import besapi
+except ModuleNotFoundError:
+    # add the module path
+    site.addsitedir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from besapi import besapi
+except ImportError:
+    # this is for the case in which we are calling bescli from besapi
+    import besapi
 
 class BESCLInterface(Cmd):
     """BES (BigFix) command-line interface processor."""
