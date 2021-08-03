@@ -16,6 +16,7 @@ import getpass
 import sys
 import site
 
+import requests.exceptions
 from cmd2 import Cmd
 
 try:
@@ -48,7 +49,7 @@ class BESCLInterface(Cmd):
         self.BES_PASSWORD = None
         self.bes_conn = None
 
-        # self.do_conf(None)
+        self.do_conf()
 
     def do_get(self, line):
         """Perform get request to BigFix server using provided api endpoint argument"""
@@ -67,7 +68,7 @@ class BESCLInterface(Cmd):
         else:
             print("Not currently logged in. Type 'login'.")
 
-    def do_conf(self, conf_file):
+    def do_conf(self, conf_file=None):
         """Attempt to load config info from file and login"""
         if conf_file:
             config_path = conf_file
@@ -75,6 +76,7 @@ class BESCLInterface(Cmd):
             config_path = [
                 "/etc/besapi.conf",
                 os.path.expanduser("~/besapi.conf"),
+                os.path.expanduser("~/.besapi.conf"),
                 "besapi.conf",
             ]
 
@@ -104,9 +106,12 @@ class BESCLInterface(Cmd):
             )
             if self.bes_conn.login():
                 print("Login Successful!")
-        else:
-            # if any missing in config file, do interactive login:
-            self.do_login()
+            else:
+                print("Login from conf file Failed!")
+                # clear likely bad password
+                self.BES_PASSWORD = None
+                # clear failed connection
+                self.bes_conn = None
 
     def do_login(self, user=None):
         """Login to BigFix Server"""
@@ -125,9 +130,9 @@ class BESCLInterface(Cmd):
             self.BES_USER_NAME = user
 
         if self.BES_ROOT_SERVER:
-            root_server = raw_input("Root Server [%s]: " % self.BES_ROOT_SERVER)
+            root_server = self.BES_ROOT_SERVER
             if not root_server:
-                root_server = self.BES_ROOT_SERVER
+                root_server = raw_input("Root Server [%s]: " % self.BES_ROOT_SERVER)
 
             self.BES_ROOT_SERVER = root_server
 
@@ -140,13 +145,34 @@ class BESCLInterface(Cmd):
             else:
                 self.BES_ROOT_SERVER = None
 
-        if self.BES_USER_NAME and self.BES_ROOT_SERVER:
-            self.bes_conn = besapi.BESConnection(user, getpass.getpass(), root_server)
-            if self.bes_conn.login():
-                print("Login Successful!")
-            else:
-                print("Login Failed!")
+        if len(self.BES_PASSWORD if self.BES_PASSWORD else "") < 1:
+            self.BES_PASSWORD = getpass.getpass()
+
+        if self.BES_USER_NAME and self.BES_ROOT_SERVER and self.BES_PASSWORD:
+            try:
+                self.bes_conn = besapi.BESConnection(
+                    user, self.BES_PASSWORD, root_server
+                )
+                if self.bes_conn.login():
+                    print("Login Successful!")
+                else:
+                    print("Login Failed!")
+                    # clear likely bad password
+                    self.BES_PASSWORD = None
+                    # clear failed connection
+                    self.bes_conn = None
+            except requests.exceptions.HTTPError:
+                print("-- clearing likely bad password --")
+                self.BES_PASSWORD = None
+                # clear failed connection
                 self.bes_conn = None
+                raise
+            except requests.exceptions.ConnectionError:
+                print("-- clearing likely bad root server --")
+                self.BES_ROOT_SERVER = None
+                # clear failed connection
+                self.bes_conn = None
+                raise
         else:
             print("Login Error!")
 
@@ -169,9 +195,16 @@ class BESCLInterface(Cmd):
         if self.bes_conn:
             self.bes_conn.logout()
             self.bes_conn = None
-        self.BES_ROOT_SERVER = None
-        self.BES_USER_NAME = None
-        self.BES_PASSWORD = None
+        if arg and "root" in arg:
+            self.BES_ROOT_SERVER = None
+        if arg and "user" in arg:
+            self.BES_USER_NAME = None
+        if arg and "pass" in arg:
+            self.BES_PASSWORD = None
+        if not arg:
+            self.BES_ROOT_SERVER = None
+            self.BES_USER_NAME = None
+            self.BES_PASSWORD = None
 
     def do_ls(self, arg=None):
         """List the current settings and connection status"""
