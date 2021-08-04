@@ -89,19 +89,16 @@ class BESCLInterface(Cmd):
             try:
                 self.BES_ROOT_SERVER = CONFPARSER.get("besapi", "BES_ROOT_SERVER")
             except:
-                self.num_errors += 1
                 self.BES_ROOT_SERVER = None
 
             try:
                 self.BES_USER_NAME = CONFPARSER.get("besapi", "BES_USER_NAME")
             except:
-                self.num_errors += 1
                 self.BES_USER_NAME = None
 
             try:
                 self.BES_PASSWORD = CONFPARSER.get("besapi", "BES_PASSWORD")
             except:
-                self.num_errors += 1
                 self.BES_PASSWORD = None
 
         if self.BES_USER_NAME and self.BES_PASSWORD and self.BES_ROOT_SERVER:
@@ -236,6 +233,8 @@ class BESCLInterface(Cmd):
 
     def do_exit(self, arg=None):
         """Exit this application"""
+        self.exit_code = self.num_errors
+        # no matter what I try I can't get anything but exit code 0 on windows
         return self.do_quit("")
 
 
