@@ -10,11 +10,11 @@ Created by Matt Hansen (mah60@psu.edu) on 2014-07-21.
 Simple command line interface for the BES (BigFix) REST API.
 """
 
-import os
 import argparse
 import getpass
-import sys
+import os
 import site
+import sys
 
 import requests.exceptions
 from cmd2 import Cmd

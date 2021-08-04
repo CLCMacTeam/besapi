@@ -10,8 +10,8 @@ Created by Matt Hansen (mah60@psu.edu) on 2014-03-20.
 Library for communicating with the BES (BigFix) REST API.
 """
 
-import site
 import os.path
+import site
 
 import requests
 from lxml import etree, objectify
