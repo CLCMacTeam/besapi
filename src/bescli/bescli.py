@@ -66,7 +66,7 @@ class BESCLInterface(Cmd):
                 # print(type(output_item))
                 print(output_item)
         else:
-            print("Not currently logged in. Type 'login'.")
+            self.pfeedback("Not currently logged in. Type 'login'.")
 
     def do_conf(self, conf_file=None):
         """Attempt to load config info from file and login"""
@@ -101,17 +101,10 @@ class BESCLInterface(Cmd):
                 self.BES_PASSWORD = None
 
         if self.BES_USER_NAME and self.BES_PASSWORD and self.BES_ROOT_SERVER:
-            self.bes_conn = besapi.BESConnection(
-                self.BES_USER_NAME, self.BES_PASSWORD, self.BES_ROOT_SERVER
-            )
-            if self.bes_conn.login():
-                print("Login Successful!")
-            else:
-                print("Login from conf file Failed!")
-                # clear likely bad password
-                self.BES_PASSWORD = None
-                # clear failed connection
-                self.bes_conn = None
+            self.pfeedback(" - all values loaded from config file - ")
+            # self.do_ls()
+            self.pfeedback(" - attempt login using config parameters - ")
+            self.do_login()
 
     def do_login(self, user=None):
         """Login to BigFix Server"""
@@ -154,27 +147,35 @@ class BESCLInterface(Cmd):
                     user, self.BES_PASSWORD, root_server
                 )
                 if self.bes_conn.login():
-                    print("Login Successful!")
+                    self.pfeedback("Login Successful!")
                 else:
-                    print("Login Failed!")
+                    self.perror("Login Failed!")
                     # clear likely bad password
                     self.BES_PASSWORD = None
                     # clear failed connection
                     self.bes_conn = None
-            except requests.exceptions.HTTPError:
-                print("-- clearing likely bad password --")
+            except requests.exceptions.HTTPError as err:
+                self.perror(err)
+                self.pfeedback("-- clearing likely bad password --")
                 self.BES_PASSWORD = None
                 # clear failed connection
                 self.bes_conn = None
-                raise
-            except requests.exceptions.ConnectionError:
-                print("-- clearing likely bad root server --")
+                self.do_ls()
+                if self.debug:
+                    # this will allow the stacktrace to be printed
+                    raise
+            except requests.exceptions.ConnectionError as err:
+                self.perror(err)
+                self.pfeedback("-- clearing likely bad root server --")
                 self.BES_ROOT_SERVER = None
                 # clear failed connection
                 self.bes_conn = None
-                raise
+                self.do_ls()
+                if self.debug:
+                    # this will allow the stacktrace to be printed
+                    raise
         else:
-            print("Login Error!")
+            self.perror("Login Error!")
 
     def do_logout(self, arg):
         """Logout and clear session"""
@@ -195,13 +196,17 @@ class BESCLInterface(Cmd):
         if self.bes_conn:
             self.bes_conn.logout()
             self.bes_conn = None
-        if arg and "root" in arg:
+        if arg and "root" in arg.lower():
+            self.pfeedback(" - clearing root server parameter -")
             self.BES_ROOT_SERVER = None
-        if arg and "user" in arg:
+        if arg and "user" in arg.lower():
+            self.pfeedback(" - clearing user parameter -")
             self.BES_USER_NAME = None
-        if arg and "pass" in arg:
+        if arg and "pass" in arg.lower():
+            self.pfeedback(" - clearing password paramter -")
             self.BES_PASSWORD = None
         if not arg:
+            self.pfeedback(" - clearing all parameters -")
             self.BES_ROOT_SERVER = None
             self.BES_USER_NAME = None
             self.BES_PASSWORD = None
