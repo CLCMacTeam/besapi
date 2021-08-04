@@ -182,6 +182,7 @@ class BESCLInterface(Cmd):
         if self.bes_conn:
             self.bes_conn.logout()
             self.bes_conn = None
+        self.pfeedback("Logout Complete!")
 
     def do_debug(self, setting):
         """Enable or Disable Debug Mode"""
