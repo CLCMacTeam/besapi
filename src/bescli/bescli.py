@@ -44,6 +44,7 @@ class BESCLInterface(Cmd):
         Cmd.__init__(self, **kwargs)
         self.prompt = "BES> "
 
+        self.num_errors = 0
         self.BES_ROOT_SERVER = None
         self.BES_USER_NAME = None
         self.BES_PASSWORD = None
@@ -88,16 +89,19 @@ class BESCLInterface(Cmd):
             try:
                 self.BES_ROOT_SERVER = CONFPARSER.get("besapi", "BES_ROOT_SERVER")
             except:
+                self.num_errors += 1
                 self.BES_ROOT_SERVER = None
 
             try:
                 self.BES_USER_NAME = CONFPARSER.get("besapi", "BES_USER_NAME")
             except:
+                self.num_errors += 1
                 self.BES_USER_NAME = None
 
             try:
                 self.BES_PASSWORD = CONFPARSER.get("besapi", "BES_PASSWORD")
             except:
+                self.num_errors += 1
                 self.BES_PASSWORD = None
 
         if self.BES_USER_NAME and self.BES_PASSWORD and self.BES_ROOT_SERVER:
@@ -156,6 +160,7 @@ class BESCLInterface(Cmd):
                     self.bes_conn = None
             except requests.exceptions.HTTPError as err:
                 self.perror(err)
+                self.num_errors += 1
                 self.pfeedback("-- clearing likely bad password --")
                 self.BES_PASSWORD = None
                 # clear failed connection
@@ -166,6 +171,7 @@ class BESCLInterface(Cmd):
                     raise
             except requests.exceptions.ConnectionError as err:
                 self.perror(err)
+                self.num_errors += 1
                 self.pfeedback("-- clearing likely bad root server --")
                 self.BES_ROOT_SERVER = None
                 # clear failed connection
@@ -224,9 +230,13 @@ class BESCLInterface(Cmd):
         )
         print("      Connected: " + str(bool(self.bes_conn)))
 
+    def do_error_count(self, arg=None):
+        """Output the number of errors"""
+        self.poutput(self.num_errors)
+
     def do_exit(self, arg=None):
         """Exit this application"""
-        sys.exit(0)
+        return self.do_quit("")
 
 
 def main():

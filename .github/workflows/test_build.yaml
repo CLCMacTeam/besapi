@@ -49,3 +49,6 @@ jobs:
       - name: Test python import bescli
         shell: bash
         run: python -c "import besapi"
+      - name: Test python bescli
+        shell: bash
+        run: python -m bescli ls logout clear error_count exit
