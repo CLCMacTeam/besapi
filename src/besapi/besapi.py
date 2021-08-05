@@ -56,19 +56,16 @@ class BESConnection:
         )
 
     def post(self, path, data, **kwargs):
-
         return RESTResult(
             self.session.post(self.url(path), data=data, verify=self.verify, **kwargs)
         )
 
     def put(self, path, data, **kwargs):
-
         return RESTResult(
             self.session.put(self.url(path), data=data, verify=self.verify, **kwargs)
         )
 
     def delete(self, path, **kwargs):
-
         return RESTResult(
             self.session.delete(self.url(path), verify=self.verify, **kwargs)
         )
