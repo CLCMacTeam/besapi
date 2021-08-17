@@ -11,11 +11,11 @@ except (ImportError, ModuleNotFoundError):
 setup(
     name="besapi",
     # version= moved to setup.cfg
-    author="Matt Hansen",
-    author_email="hansen.m@psu.edu",
+    author="Matt Hansen, James Stewart",
+    author_email="hansen.m@psu.edu, james@jgstew.com",
     description="Library for working with the BigFix REST API",
     license="BSD",
-    keywords="bigfix ibm iem tem rest",
+    keywords="bigfix iem tem rest api",
     url="https://github.com/CLCMacTeam/besapi",
     long_description=(
         "python-besapi is a Python library designed to "
