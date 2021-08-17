@@ -178,7 +178,7 @@ class RESTResult:
             except etree.XMLSchemaParseError as err:
                 # this should only error if the XSD itself is malformed
                 print(f"ERROR with {xsd}: {err}")
-                continue
+                raise
 
             if xmlschema.validate(xmldoc):
                 return True
