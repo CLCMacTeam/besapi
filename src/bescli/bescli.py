@@ -46,6 +46,9 @@ class BESCLInterface(Cmd):
         self.BES_USER_NAME = None
         self.BES_PASSWORD = None
         self.bes_conn = None
+        # set default config file path
+        self.conf_path = os.path.expanduser("~/.besapi.conf")
+        self.CONFPARSER = SafeConfigParser()
 
         self.do_conf()
 
@@ -68,33 +71,38 @@ class BESCLInterface(Cmd):
 
     def do_conf(self, conf_file=None):
         """Attempt to load config info from file and login"""
+        config_path = [
+            "/etc/besapi.conf",
+            os.path.expanduser("~/besapi.conf"),
+            os.path.expanduser("~/.besapi.conf"),
+            "besapi.conf",
+        ]
+        if self.conf_path not in config_path:
+            config_path.append(self.conf_path)
+        # if conf_file specified, then only use that:
         if conf_file:
-            config_path = conf_file
-        else:
-            config_path = [
-                "/etc/besapi.conf",
-                os.path.expanduser("~/besapi.conf"),
-                os.path.expanduser("~/.besapi.conf"),
-                "besapi.conf",
-            ]
+            config_path = [conf_file]
 
-        CONFPARSER = SafeConfigParser()
-        CONFPARSER.read(config_path)
+        found_config_files = self.CONFPARSER.read(config_path)
+        if found_config_files:
+            self.pfeedback(f" - Found Config File(s):\n{found_config_files}")
+            if found_config_files[0] != self.conf_path:
+                self.conf_path = found_config_files[0]
 
-        if CONFPARSER:
+        if self.CONFPARSER:
 
             try:
-                self.BES_ROOT_SERVER = CONFPARSER.get("besapi", "BES_ROOT_SERVER")
+                self.BES_ROOT_SERVER = self.CONFPARSER.get("besapi", "BES_ROOT_SERVER")
             except BaseException:
                 self.BES_ROOT_SERVER = None
 
             try:
-                self.BES_USER_NAME = CONFPARSER.get("besapi", "BES_USER_NAME")
+                self.BES_USER_NAME = self.CONFPARSER.get("besapi", "BES_USER_NAME")
             except BaseException:
                 self.BES_USER_NAME = None
 
             try:
-                self.BES_PASSWORD = CONFPARSER.get("besapi", "BES_PASSWORD")
+                self.BES_PASSWORD = self.CONFPARSER.get("besapi", "BES_PASSWORD")
             except BaseException:
                 self.BES_PASSWORD = None
 
@@ -119,6 +127,9 @@ class BESCLInterface(Cmd):
                     user = getpass.getuser()
 
             self.BES_USER_NAME = user
+            if not self.CONFPARSER.has_section("besapi"):
+                self.CONFPARSER.add_section("besapi")
+            self.CONFPARSER.set("besapi", "BES_USER_NAME", user)
 
         if self.BES_ROOT_SERVER:
             root_server = self.BES_ROOT_SERVER
@@ -133,11 +144,17 @@ class BESCLInterface(Cmd):
             )
             if root_server:
                 self.BES_ROOT_SERVER = root_server
+                if not self.CONFPARSER.has_section("besapi"):
+                    self.CONFPARSER.add_section("besapi")
+                self.CONFPARSER.set("besapi", "BES_ROOT_SERVER", root_server)
             else:
                 self.BES_ROOT_SERVER = None
 
         if len(self.BES_PASSWORD if self.BES_PASSWORD else "") < 1:
             self.BES_PASSWORD = getpass.getpass()
+            if not self.CONFPARSER.has_section("besapi"):
+                self.CONFPARSER.add_section("besapi")
+            self.CONFPARSER.set("besapi", "BES_PASSWORD", self.BES_PASSWORD)
 
         if self.BES_USER_NAME and self.BES_ROOT_SERVER and self.BES_PASSWORD:
             try:
@@ -212,6 +229,18 @@ class BESCLInterface(Cmd):
             self.BES_USER_NAME = None
             self.BES_PASSWORD = None
 
+    def do_saveconf(self, arg=None):
+        """save current config to file"""
+        if not self.bes_conn:
+            self.do_login()
+        if not self.bes_conn:
+            print("Can't save config without working login")
+        else:
+            conf_file_path = self.conf_path
+            self.pfeedback(f"Saving Config File to: {conf_file_path}")
+            with open(conf_file_path, 'w') as configfile:
+                self.CONFPARSER.write(configfile)
+
     def do_ls(self, arg=None):
         """List the current settings and connection status"""
         print(
@@ -223,6 +252,7 @@ class BESCLInterface(Cmd):
             + str(len(self.BES_PASSWORD if self.BES_PASSWORD else ""))
         )
         print("      Connected: " + str(bool(self.bes_conn)))
+        print("Config File Path: " + self.conf_path)
 
     def do_error_count(self, arg=None):
         """Output the number of errors"""
