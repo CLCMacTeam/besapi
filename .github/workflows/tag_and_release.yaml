@@ -31,6 +31,7 @@ jobs:
         shell: bash
         run: git show-ref --tags --verify --quiet -- "refs/tags/v${{ steps.getversion.outputs.version }}" && echo "::set-output name=tagged::0" || echo "::set-output name=tagged::1"
       # wait for all other tests to succeed
+      #   what if no other tests?
       - name: Wait for tests to succeed
         if: steps.tagged.outputs.tagged == 1
         uses: lewagon/wait-on-check-action@v0.2
