@@ -21,6 +21,7 @@ from pkg_resources import resource_filename
 
 class BESConnection:
     """BigFix RESTAPI connection abstraction class"""
+
     def __init__(self, username, password, rootserver, verify=False):
 
         if not verify:
@@ -126,6 +127,7 @@ class BESConnection:
 
 class RESTResult:
     """BigFix REST API Result Abstraction Class"""
+
     def __init__(self, request):
         self.request = request
         self.text = request.text
