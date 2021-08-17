@@ -139,5 +139,4 @@ Related Items
 
 LICENSE
 =======
-- Copyright (c) 2015, The Pennsylvania State University
 - GNU General Public License v2

@@ -6,4 +6,4 @@ besapi is a python module for interacting with the BigFix REST API
 
 from . import besapi
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
