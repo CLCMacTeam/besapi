@@ -10,7 +10,6 @@ Created by Matt Hansen (mah60@psu.edu) on 2014-07-21.
 Simple command line interface for the BES (BigFix) REST API.
 """
 
-import argparse
 import getpass
 import os
 import site
@@ -23,8 +22,6 @@ try:
     from ConfigParser import SafeConfigParser
 except (ImportError, ModuleNotFoundError):
     from configparser import SafeConfigParser
-
-# from lxml import etree, objectify
 
 try:
     from besapi import besapi
@@ -88,17 +85,17 @@ class BESCLInterface(Cmd):
 
             try:
                 self.BES_ROOT_SERVER = CONFPARSER.get("besapi", "BES_ROOT_SERVER")
-            except:
+            except BaseException:
                 self.BES_ROOT_SERVER = None
 
             try:
                 self.BES_USER_NAME = CONFPARSER.get("besapi", "BES_USER_NAME")
-            except:
+            except BaseException:
                 self.BES_USER_NAME = None
 
             try:
                 self.BES_PASSWORD = CONFPARSER.get("besapi", "BES_PASSWORD")
-            except:
+            except BaseException:
                 self.BES_PASSWORD = None
 
         if self.BES_USER_NAME and self.BES_PASSWORD and self.BES_ROOT_SERVER:
@@ -236,6 +233,20 @@ class BESCLInterface(Cmd):
         self.exit_code = self.num_errors
         # no matter what I try I can't get anything but exit code 0 on windows
         return self.do_quit("")
+
+    def do_query(self, statement):
+        """Get Session Relevance Results"""
+        if not self.bes_conn:
+            self.do_login()
+        if not self.bes_conn:
+            self.poutput("ERROR: can't query without login")
+        else:
+            if statement.raw:
+                # get everything after `query `
+                rel_text = statement.raw.split(" ", 1)[1]
+                self.poutput("Q: " + rel_text)
+                rel_result = self.bes_conn.session_relevance_string(rel_text)
+                self.poutput(rel_result)
 
 
 def main():

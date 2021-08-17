@@ -12,6 +12,7 @@ Library for communicating with the BES (BigFix) REST API.
 
 import os.path
 import site
+import urllib.parse
 
 import requests
 from lxml import etree, objectify
@@ -23,7 +24,6 @@ class BESConnection:
 
         if not verify:
             # disable SSL warnings
-            # http://stackoverflow.com/questions/27981545/suppress-insecurerequestwarning-unverified-https-request-is-being-made-in-pytho
             requests.packages.urllib3.disable_warnings()  # pylint: disable=no-member
 
         self.session = requests.Session()
@@ -70,6 +70,38 @@ class BESConnection:
             self.session.delete(self.url(path), verify=self.verify, **kwargs)
         )
 
+    def session_relevance_xml(self, relevance, **kwargs):
+        return RESTResult(
+            self.session.post(
+                self.url("query"),
+                data=f"relevance={urllib.parse.quote(relevance, safe=':+')}",
+                verify=self.verify,
+                **kwargs,
+            )
+        )
+
+    def session_relevance_array(self, relevance, **kwargs):
+        rel_result = self.session_relevance_xml(relevance, **kwargs)
+        # print(rel_result)
+        result = []
+        try:
+            for item in rel_result.objectify_text(rel_result.text).Query.Result.Answer:
+                result.append(item.text)
+        except AttributeError as err:
+            # print(err)
+            if "no such child: Answer" in str(err):
+                result.append(
+                    "ERROR: "
+                    + rel_result.objectify_text(rel_result.text).Query.Error.text
+                )
+            else:
+                raise
+        return result
+
+    def session_relevance_string(self, relevance, **kwargs):
+        rel_result_array = self.session_relevance_array(relevance, **kwargs)
+        return "\n".join(rel_result_array)
+
     def login(self):
         return bool(self.get("login").request.status_code == 200)
 
@@ -108,7 +140,7 @@ class RESTResult:
             # I think this is needed for python3 compatibility:
             try:
                 return self.besxml.decode("utf-8")
-            except:
+            except BaseException:
                 return self.besxml
         else:
             return self.text
@@ -133,7 +165,7 @@ class RESTResult:
     def validate_xsd(self, doc):
         try:
             xmldoc = etree.fromstring(doc)
-        except:
+        except BaseException:
             return False
 
         for xsd in ["BES.xsd", "BESAPI.xsd", "BESActionSettings.xsd"]:
