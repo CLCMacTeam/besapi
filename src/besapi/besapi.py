@@ -133,6 +133,7 @@ class RESTResult:
             if self.validate_xsd(request.text):
                 self.valid = True
             else:
+                # print("WARNING: response appears invalid")
                 self.valid = False
 
     def __str__(self):
@@ -174,7 +175,9 @@ class RESTResult:
             # one schema may throw an error while another will validate
             try:
                 xmlschema = etree.XMLSchema(xmlschema_doc)
-            except etree.XMLSchemaParseError:
+            except etree.XMLSchemaParseError as err:
+                # this should only error if the XSD itself is malformed
+                print(f"ERROR with {xsd}: {err}")
                 continue
 
             if xmlschema.validate(xmldoc):
