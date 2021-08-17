@@ -39,7 +39,7 @@ class BESCLInterface(Cmd):
 
     def __init__(self, **kwargs):
         Cmd.__init__(self, **kwargs)
-        self.prompt = "BES> "
+        self.prompt = "BigFix> "
 
         self.num_errors = 0
         self.BES_ROOT_SERVER = None
