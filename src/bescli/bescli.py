@@ -238,7 +238,7 @@ class BESCLInterface(Cmd):
         else:
             conf_file_path = self.conf_path
             self.pfeedback(f"Saving Config File to: {conf_file_path}")
-            with open(conf_file_path, 'w') as configfile:
+            with open(conf_file_path, "w") as configfile:
                 self.CONFPARSER.write(configfile)
 
     def do_ls(self, arg=None):

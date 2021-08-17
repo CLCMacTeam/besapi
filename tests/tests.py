@@ -1,4 +1,3 @@
-
 import os
 import subprocess
 
@@ -13,5 +12,8 @@ import bescli
 
 print(f"besapi version: {besapi.__version__}")
 
-if os.name == 'nt':
-    subprocess.run('CMD /C python -m besapi ls clear ls conf "query number of bes computers" exit', check=True)
+if os.name == "nt":
+    subprocess.run(
+        'CMD /C python -m besapi ls clear ls conf "query number of bes computers" exit',
+        check=True,
+    )

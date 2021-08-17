@@ -22,9 +22,7 @@ setup(
         "interact with the BES (BigFix) REST API."
     ),
     packages=["besapi", "bescli"],
-    package_data={
-        "besapi": ["schemas/*.xsd"],
-    },
+    package_data={"besapi": ["schemas/*.xsd"],},
     install_requires=["requests", "lxml", "cmd2"],
     include_package_data=True,
     package_dir={"": "src"},
