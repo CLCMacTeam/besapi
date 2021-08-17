@@ -35,7 +35,7 @@ except ImportError:
 
 
 class BESCLInterface(Cmd):
-    """BES (BigFix) command-line interface processor."""
+    """BigFix command-line interface processor."""
 
     def __init__(self, **kwargs):
         Cmd.__init__(self, **kwargs)
@@ -280,6 +280,7 @@ class BESCLInterface(Cmd):
 
 
 def main():
+    """Run the command loop if invoked"""
     BESCLInterface().cmdloop()
 
 

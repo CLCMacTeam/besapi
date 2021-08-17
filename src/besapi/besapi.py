@@ -20,6 +20,7 @@ from pkg_resources import resource_filename
 
 
 class BESConnection:
+    """BigFix RESTAPI connection abstraction class"""
     def __init__(self, username, password, rootserver, verify=False):
 
         if not verify:
@@ -43,6 +44,7 @@ class BESConnection:
             self.get("login").request.raise_for_status()
 
     def url(self, path):
+        """get absolute url"""
         if path.startswith(self.rootserver):
             url = path
         else:
@@ -51,26 +53,31 @@ class BESConnection:
         return url
 
     def get(self, path="help", **kwargs):
+        """HTTP GET request"""
         return RESTResult(
             self.session.get(self.url(path), verify=self.verify, **kwargs)
         )
 
     def post(self, path, data, **kwargs):
+        """HTTP POST request"""
         return RESTResult(
             self.session.post(self.url(path), data=data, verify=self.verify, **kwargs)
         )
 
     def put(self, path, data, **kwargs):
+        """HTTP PUT request"""
         return RESTResult(
             self.session.put(self.url(path), data=data, verify=self.verify, **kwargs)
         )
 
     def delete(self, path, **kwargs):
+        """HTTP DELETE request"""
         return RESTResult(
             self.session.delete(self.url(path), verify=self.verify, **kwargs)
         )
 
     def session_relevance_xml(self, relevance, **kwargs):
+        """Get Session Relevance Results XML"""
         return RESTResult(
             self.session.post(
                 self.url("query"),
@@ -81,6 +88,7 @@ class BESConnection:
         )
 
     def session_relevance_array(self, relevance, **kwargs):
+        """Get Session Relevance Results array"""
         rel_result = self.session_relevance_xml(relevance, **kwargs)
         # print(rel_result)
         result = []
@@ -99,13 +107,16 @@ class BESConnection:
         return result
 
     def session_relevance_string(self, relevance, **kwargs):
+        """Get Session Relevance Results string"""
         rel_result_array = self.session_relevance_array(relevance, **kwargs)
         return "\n".join(rel_result_array)
 
     def login(self):
+        """do login"""
         return bool(self.get("login").request.status_code == 200)
 
     def logout(self):
+        """clear session and close it"""
         self.session.auth = None
         self.session.cookies.clear()
         self.session.close()
@@ -114,6 +125,7 @@ class BESConnection:
 
 
 class RESTResult:
+    """BigFix REST API Result Abstraction Class"""
     def __init__(self, request):
         self.request = request
         self.text = request.text
@@ -151,6 +163,7 @@ class RESTResult:
 
     @property
     def besxml(self):
+        """property for parsed xml representation"""
         if self.valid and self._besxml is None:
             self._besxml = self.xmlparse_text(self.text)
 
@@ -158,12 +171,14 @@ class RESTResult:
 
     @property
     def besobj(self):
+        """property for xml object representation"""
         if self.valid and self._besobj is None:
             self._besobj = self.objectify_text(self.text)
 
         return self._besobj
 
     def validate_xsd(self, doc):
+        """validate results using XML XSDs"""
         try:
             xmldoc = etree.fromstring(doc)
         except BaseException:
@@ -186,7 +201,7 @@ class RESTResult:
         return False
 
     def xmlparse_text(self, text):
-
+        """parse response text as xml"""
         if type(text) is str:
             root_xml = etree.fromstring(text.encode("utf-8"))
         else:
@@ -195,7 +210,7 @@ class RESTResult:
         return etree.tostring(root_xml, encoding="utf-8", xml_declaration=True)
 
     def objectify_text(self, text):
-
+        """parse response text as objectified xml"""
         if type(text) is str:
             root_xml = text.encode("utf-8")
         else:
@@ -205,6 +220,7 @@ class RESTResult:
 
 
 def main():
+    """if invoked directly, run bescli command loop"""
     # pylint: disable=import-outside-toplevel
     try:
         from bescli import bescli
