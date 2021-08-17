@@ -221,7 +221,7 @@ class BESCLInterface(Cmd):
             self.pfeedback(" - clearing user parameter -")
             self.BES_USER_NAME = None
         if arg and "pass" in arg.lower():
-            self.pfeedback(" - clearing password paramter -")
+            self.pfeedback(" - clearing password parameter -")
             self.BES_PASSWORD = None
         if not arg:
             self.pfeedback(" - clearing all parameters -")
