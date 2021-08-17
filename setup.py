@@ -17,10 +17,7 @@ setup(
     license="BSD",
     keywords="bigfix iem tem rest api",
     url="https://github.com/CLCMacTeam/besapi",
-    long_description=(
-        "python-besapi is a Python library designed to "
-        "interact with the BES (BigFix) REST API."
-    ),
+    # long_description= moved to setup.cfg
     packages=["besapi", "bescli"],
     package_data={"besapi": ["schemas/*.xsd"]},
     install_requires=["requests", "lxml", "cmd2"],
