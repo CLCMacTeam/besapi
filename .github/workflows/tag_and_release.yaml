@@ -36,7 +36,7 @@ jobs:
         if: steps.tagged.outputs.tagged == 1
         uses: lewagon/wait-on-check-action@v0.2
         with:
-          ref: main
+          ref: master
           running-workflow-name: 'Tag and Release'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 30
