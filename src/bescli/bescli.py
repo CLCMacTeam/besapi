@@ -49,7 +49,6 @@ class BESCLInterface(Cmd):
         # set default config file path
         self.conf_path = os.path.expanduser("~/.besapi.conf")
         self.CONFPARSER = SafeConfigParser()
-
         self.do_conf()
 
     def do_get(self, line):
@@ -68,6 +67,14 @@ class BESCLInterface(Cmd):
                 print(output_item)
         else:
             self.pfeedback("Not currently logged in. Type 'login'.")
+
+    def do_config(self, conf_file=None):
+        """Attempt to load config info from file and login"""
+        self.do_conf(conf_file)
+
+    def do_loadconfig(self, conf_file=None):
+        """Attempt to load config info from file and login"""
+        self.do_conf(conf_file)
 
     def do_conf(self, conf_file=None):
         """Attempt to load config info from file and login"""
@@ -229,6 +236,10 @@ class BESCLInterface(Cmd):
             self.BES_USER_NAME = None
             self.BES_PASSWORD = None
 
+    def do_saveconfig(self, arg=None):
+        """save current config to file"""
+        self.do_saveconf(arg)
+
     def do_saveconf(self, arg=None):
         """save current config to file"""
         if not self.bes_conn:
@@ -240,6 +251,10 @@ class BESCLInterface(Cmd):
             self.pfeedback(f"Saving Config File to: {conf_file_path}")
             with open(conf_file_path, "w") as configfile:
                 self.CONFPARSER.write(configfile)
+
+    def do_showconfig(self, arg=None):
+        """List the current settings and connection status"""
+        self.do_ls(arg)
 
     def do_ls(self, arg=None):
         """List the current settings and connection status"""

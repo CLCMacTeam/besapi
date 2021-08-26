@@ -1,6 +1,11 @@
 {
     "python.linting.pylintEnabled": true,
     "python.analysis.diagnosticSeverityOverrides": {
-        "reportMissingImports": "information"
-    }
+      "reportMissingImports": "information"
+    },
+    "python.formatting.provider": "black",
+    "python.autoComplete.addBrackets": true,
+    "editor.formatOnSave": true,
+    "git.autofetch": true,
+    "python.analysis.completeFunctionParens": true
 }
