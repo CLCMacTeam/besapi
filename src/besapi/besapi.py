@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-#
-# Copyright 2014 The Pennsylvania State University.
-#
 """
 besapi.py
 
