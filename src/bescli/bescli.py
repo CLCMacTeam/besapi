@@ -33,6 +33,8 @@ except ImportError:
     # this is for the case in which we are calling bescli from besapi
     import besapi
 
+from besapi import __version__
+
 
 class BESCLInterface(Cmd):
     """BigFix command-line interface processor."""
@@ -292,6 +294,10 @@ class BESCLInterface(Cmd):
                 self.poutput("Q: " + rel_text)
                 rel_result = self.bes_conn.session_relevance_string(rel_text)
                 self.poutput(rel_result)
+
+    def do_version(self, statement):
+        """output version of besapi"""
+        print(__version__)
 
 
 def main():
