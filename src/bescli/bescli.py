@@ -296,6 +296,10 @@ class BESCLInterface(Cmd):
         """output version of besapi"""
         print(__version__)
 
+    def do_export_site(self, site_path):
+        """export site contents to current folder"""
+        self.bes_conn.export_site_contents(site_path, verbose=True)
+
 
 def main():
     """Run the command loop if invoked"""

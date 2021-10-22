@@ -11,10 +11,30 @@ Library for communicating with the BES (BigFix) REST API.
 import os.path
 import site
 import urllib.parse
+import string
 
 import requests
 from lxml import etree, objectify
 from pkg_resources import resource_filename
+
+
+def sanitize_txt(*args):
+    """ Clean arbitrary text for safe file system usage."""
+    valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+
+    sani_args = []
+    for arg in args:
+        sani_args.append(
+            "".join(
+                c
+                for c in str(arg).replace("/", "-").replace("\\", "-")
+                if c in valid_chars
+            )
+            .encode("ascii", "ignore")
+            .decode()
+        )
+
+    return tuple(sani_args)
 
 
 class BESConnection:
@@ -119,6 +139,62 @@ class BESConnection:
         self.session.auth = None
         self.session.cookies.clear()
         self.session.close()
+
+    def export_site_contents(
+        self, site_path, export_folder="./", name_trim=70, verbose=False
+    ):
+        """export contents of site"""
+        if verbose:
+            print("export_site_contents()")
+        # Iterate Over All Site Content
+        content = self.get("site/" + site_path + "/content")
+        if content.request.status_code == 200:
+            print(
+                "Archiving %d items from %s..." % (content().countchildren(), site_path)
+            )
+
+            for item in content().iterchildren():
+                if verbose:
+                    print(
+                        "{%s} (%s) [%s] %s - %s    "
+                        % (
+                            site_path,
+                            item.tag,
+                            item.ID,
+                            item.Name.text,
+                            item.attrib["LastModified"],
+                        )
+                    )
+
+                # Get Specific Content
+                content = self.get(
+                    item.attrib["Resource"].replace("http://", "https://")
+                )
+
+                # Write Content to Disk
+                if content:
+                    if not os.path.exists(
+                        export_folder + "%s/%s" % sanitize_txt(site_path, item.tag)
+                    ):
+                        os.makedirs(
+                            export_folder + "%s/%s" % sanitize_txt(site_path, item.tag)
+                        )
+
+                    with open(
+                        export_folder
+                        + "%s/%s/%s - %s.bes"
+                        % sanitize_txt(
+                            site_path,
+                            item.tag,
+                            item.ID,
+                            # http://stackoverflow.com/questions/2872512/python-truncate-a-long-string
+                            # trimming to 150 worked in most cases, but recently even that had issues.
+                            # now trimmed to first name_trim characters of the title of the item.
+                            item.Name.text[:name_trim],
+                        ),
+                        "wb",
+                    ) as bes_file:
+                        bes_file.write(content.text.encode("utf-8"))
 
     __call__ = login
 
