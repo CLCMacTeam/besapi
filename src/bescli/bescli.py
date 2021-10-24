@@ -200,7 +200,7 @@ class BESCLInterface(Cmd):
         else:
             self.perror("Login Error!")
 
-    def do_logout(self, arg):
+    def do_logout(self, arg=None):
         """Logout and clear session"""
         if self.bes_conn:
             self.bes_conn.logout()
@@ -270,7 +270,7 @@ class BESCLInterface(Cmd):
 
     def do_error_count(self, arg=None):
         """Output the number of errors"""
-        self.poutput(self.num_errors)
+        self.poutput(f"Error Count: {self.num_errors}")
 
     def do_exit(self, arg=None):
         """Exit this application"""
@@ -288,13 +288,13 @@ class BESCLInterface(Cmd):
             if statement.raw:
                 # get everything after `query `
                 rel_text = statement.raw.split(" ", 1)[1]
-                self.poutput("Q: " + rel_text)
+                self.poutput(f"Q: {rel_text}")
                 rel_result = self.bes_conn.session_relevance_string(rel_text)
-                self.poutput(rel_result)
+                self.poutput(f"A: {rel_result}")
 
-    def do_version(self, statement):
+    def do_version(self, statement=None):
         """output version of besapi"""
-        print(__version__)
+        self.poutput(f"besapi version: {__version__}")
 
     def do_export_site(self, site_path):
         """export site contents to current folder"""
