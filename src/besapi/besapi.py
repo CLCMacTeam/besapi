@@ -143,7 +143,11 @@ class BESConnection:
     def export_site_contents(
         self, site_path, export_folder="./", name_trim=70, verbose=False
     ):
-        """export contents of site"""
+        """export contents of site
+        Originally here:
+        - https://gist.github.com/jgstew/1b2da12af59b71c9f88a
+        - https://bigfix.me/fixlet/details/21282
+        """
         if verbose:
             print("export_site_contents()")
         # Iterate Over All Site Content
