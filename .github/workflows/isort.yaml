@@ -5,11 +5,13 @@ on:
   push:
     paths:
       - "**.py"
+      - ".isort.cfg"
       - "requirements.txt"
       - ".github/workflows/isort.yaml"
   pull_request:
     paths:
       - "**.py"
+      - ".isort.cfg"
       - "requirements.txt"
       - ".github/workflows/isort.yaml"
 
