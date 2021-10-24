@@ -10,8 +10,8 @@ Library for communicating with the BES (BigFix) REST API.
 
 import os.path
 import site
-import urllib.parse
 import string
+import urllib.parse
 
 import requests
 from lxml import etree, objectify
@@ -19,7 +19,7 @@ from pkg_resources import resource_filename
 
 
 def sanitize_txt(*args):
-    """ Clean arbitrary text for safe file system usage."""
+    """Clean arbitrary text for safe file system usage."""
     valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
 
     sani_args = []

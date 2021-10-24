@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "yamllint",
+      "type": "shell",
+      "command": "yamllint ${file}",
+      "dependsOn": ["yaml file only"],
+      "problemMatcher": []
+    },
+    {
+      "label": "yaml file only",
+      "type": "shell",
+      "command": "echo no yaml check for non-windows",
+      "windows": {
+        "command": "if ( [IO.Path]::GetExtension('${file}') -ne '.yaml' ) { Write-Host 'Not YAML File!'; Exit 1 }"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "python file only",
+      "type": "shell",
+      "command": "echo no yaml check for non-windows",
+      "windows": {
+        "command": "if ( [IO.Path]::GetExtension('${file}') -ne '.py' ) { Write-Host 'Not Python File!'; Exit 1 }"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "isort",
+      "type": "shell",
+      "command": "isort ${file}",
+      "dependsOn": ["python file only"],
+      "problemMatcher": []
+    }
+  ]
+}
