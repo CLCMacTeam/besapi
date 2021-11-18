@@ -46,6 +46,7 @@ class BESConnection:
             # disable SSL warnings
             requests.packages.urllib3.disable_warnings()  # pylint: disable=no-member
 
+        self.username = username
         self.session = requests.Session()
         self.session.auth = (username, password)
 
@@ -59,8 +60,30 @@ class BESConnection:
         self.rootserver = rootserver
         self.verify = verify
 
-        if not self.login():
-            self.get("login").request.raise_for_status()
+        self.login()
+
+    def __repr__(self):
+        """object representation"""
+        # https://stackoverflow.com/a/2626364/861745
+        return f"Object: besapi.BESConnction( username={self.username}, rootserver={self.rootserver} )"
+
+    def __eq__(self, other):
+        if (
+            self.rootserver == other.rootserver
+            and self.session.auth == other.session.auth
+            and self.verify == other.verify
+        ):
+            return True
+        return False
+
+    def __del__(self):
+        """cleanup on deletion of instance"""
+        self.logout()
+        self.session.auth = None
+
+    def __bool__(self):
+        """get true or false"""
+        return self.login()
 
     def url(self, path):
         """get absolute url"""
@@ -130,13 +153,19 @@ class BESConnection:
         rel_result_array = self.session_relevance_array(relevance, **kwargs)
         return "\n".join(rel_result_array)
 
+    def connected(self):
+        """return true if connected"""
+        return bool(self.get("login").request.status_code == 200)
+
     def login(self):
         """do login"""
-        return bool(self.get("login").request.status_code == 200)
+        if not self.connected():
+            self.get("login").request.raise_for_status()
+
+        return self.connected()
 
     def logout(self):
         """clear session and close it"""
-        self.session.auth = None
         self.session.cookies.clear()
         self.session.close()
 
@@ -201,6 +230,9 @@ class BESConnection:
                         bes_file.write(content.text.encode("utf-8"))
 
     __call__ = login
+    # https://stackoverflow.com/q/40536821/861745
+    __enter__ = login
+    __exit__ = logout
 
 
 class RESTResult:
