@@ -300,6 +300,15 @@ class BESCLInterface(Cmd):
         """export site contents to current folder"""
         self.bes_conn.export_site_contents(site_path, verbose=True)
 
+    complete_upload = Cmd.path_complete
+
+    def do_upload(self, file_path):
+        """upload file to root server"""
+        if not os.access(file_path, os.R_OK):
+            print(file_path, "is not a readable file")
+        else:
+            print(self.bes_conn.upload(file_path))
+
 
 def main():
     """Run the command loop if invoked"""
