@@ -1,31 +1,56 @@
 #!/usr/bin/env python
-#
-# Copyright 2014 The Pennsylvania State University.
-#
 """
 besapi.py
 
 Created by Matt Hansen (mah60@psu.edu) on 2014-03-20.
+Enhancements by James Stewart since 2021
 
 Library for communicating with the BES (BigFix) REST API.
 """
 
+import os
 import site
-import os.path
+import string
+
+try:
+    from urllib import parse
+except ImportError:
+    from urlparse import parse_qs as parse
 
 import requests
 from lxml import etree, objectify
 from pkg_resources import resource_filename
 
 
+def sanitize_txt(*args):
+    """Clean arbitrary text for safe file system usage."""
+    valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+
+    sani_args = []
+    for arg in args:
+        sani_args.append(
+            "".join(
+                c
+                for c in str(arg).replace("/", "-").replace("\\", "-")
+                if c in valid_chars
+            )
+            .encode("ascii", "ignore")
+            .decode()
+        )
+
+    return tuple(sani_args)
+
+
 class BESConnection:
+    """BigFix RESTAPI connection abstraction class"""
+
     def __init__(self, username, password, rootserver, verify=False):
 
         if not verify:
             # disable SSL warnings
-            # http://stackoverflow.com/questions/27981545/suppress-insecurerequestwarning-unverified-https-request-is-being-made-in-pytho
             requests.packages.urllib3.disable_warnings()  # pylint: disable=no-member
 
+        self.username = username
         self.session = requests.Session()
         self.session.auth = (username, password)
 
@@ -39,10 +64,33 @@ class BESConnection:
         self.rootserver = rootserver
         self.verify = verify
 
-        if not self.login():
-            self.get("login").request.raise_for_status()
+        self.login()
+
+    def __repr__(self):
+        """object representation"""
+        # https://stackoverflow.com/a/2626364/861745
+        return f"Object: besapi.BESConnction( username={self.username}, rootserver={self.rootserver} )"
+
+    def __eq__(self, other):
+        if (
+            self.rootserver == other.rootserver
+            and self.session.auth == other.session.auth
+            and self.verify == other.verify
+        ):
+            return True
+        return False
+
+    def __del__(self):
+        """cleanup on deletion of instance"""
+        self.logout()
+        self.session.auth = None
+
+    def __bool__(self):
+        """get true or false"""
+        return self.login()
 
     def url(self, path):
+        """get absolute url"""
         if path.startswith(self.rootserver):
             url = path
         else:
@@ -51,40 +99,167 @@ class BESConnection:
         return url
 
     def get(self, path="help", **kwargs):
+        """HTTP GET request"""
         return RESTResult(
             self.session.get(self.url(path), verify=self.verify, **kwargs)
         )
 
     def post(self, path, data, **kwargs):
-
+        """HTTP POST request"""
         return RESTResult(
             self.session.post(self.url(path), data=data, verify=self.verify, **kwargs)
         )
 
     def put(self, path, data, **kwargs):
-
+        """HTTP PUT request"""
         return RESTResult(
             self.session.put(self.url(path), data=data, verify=self.verify, **kwargs)
         )
 
     def delete(self, path, **kwargs):
-
+        """HTTP DELETE request"""
         return RESTResult(
             self.session.delete(self.url(path), verify=self.verify, **kwargs)
         )
 
-    def login(self):
+    def session_relevance_xml(self, relevance, **kwargs):
+        """Get Session Relevance Results XML"""
+        return RESTResult(
+            self.session.post(
+                self.url("query"),
+                data=f"relevance={parse.quote(relevance, safe=':+')}",
+                verify=self.verify,
+                **kwargs,
+            )
+        )
+
+    def session_relevance_array(self, relevance, **kwargs):
+        """Get Session Relevance Results array"""
+        rel_result = self.session_relevance_xml(relevance, **kwargs)
+        # print(rel_result)
+        result = []
+        try:
+            for item in rel_result.objectify_text(rel_result.text).Query.Result.Answer:
+                result.append(item.text)
+        except AttributeError as err:
+            # print(err)
+            if "no such child: Answer" in str(err):
+                result.append(
+                    "ERROR: "
+                    + rel_result.objectify_text(rel_result.text).Query.Error.text
+                )
+            else:
+                raise
+        return result
+
+    def session_relevance_string(self, relevance, **kwargs):
+        """Get Session Relevance Results string"""
+        rel_result_array = self.session_relevance_array(relevance, **kwargs)
+        return "\n".join(rel_result_array)
+
+    def connected(self):
+        """return true if connected"""
         return bool(self.get("login").request.status_code == 200)
 
+    def login(self):
+        """do login"""
+        if not self.connected():
+            self.get("login").request.raise_for_status()
+
+        return self.connected()
+
     def logout(self):
-        self.session.auth = None
+        """clear session and close it"""
         self.session.cookies.clear()
         self.session.close()
 
+    def upload(self, file_path, file_name=None):
+        """
+        upload a single file
+        https://developer.bigfix.com/rest-api/api/upload.html
+        """
+        if not os.access(file_path, os.R_OK):
+            print(file_path, "is not readable")
+            raise FileNotFoundError
+
+        # if file_name not specified, then get it from tail of file_path
+        if not file_name:
+            file_name = os.path.basename(file_path)
+
+        # Example Header::  Content-Disposition: attachment; filename="file.xml"
+        headers = {"Content-Disposition": f'attachment; filename="{file_name}"'}
+        with open(file_path, "rb") as f:
+            return self.post(self.url("upload"), data=f, headers=headers)
+
+    def export_site_contents(
+        self, site_path, export_folder="./", name_trim=70, verbose=False
+    ):
+        """export contents of site
+        Originally here:
+        - https://gist.github.com/jgstew/1b2da12af59b71c9f88a
+        - https://bigfix.me/fixlet/details/21282
+        """
+        if verbose:
+            print("export_site_contents()")
+        # Iterate Over All Site Content
+        content = self.get("site/" + site_path + "/content")
+        if content.request.status_code == 200:
+            print(
+                "Archiving %d items from %s..." % (content().countchildren(), site_path)
+            )
+
+            for item in content().iterchildren():
+                if verbose:
+                    print(
+                        "{%s} (%s) [%s] %s - %s    "
+                        % (
+                            site_path,
+                            item.tag,
+                            item.ID,
+                            item.Name.text,
+                            item.attrib["LastModified"],
+                        )
+                    )
+
+                # Get Specific Content
+                content = self.get(
+                    item.attrib["Resource"].replace("http://", "https://")
+                )
+
+                # Write Content to Disk
+                if content:
+                    if not os.path.exists(
+                        export_folder + "%s/%s" % sanitize_txt(site_path, item.tag)
+                    ):
+                        os.makedirs(
+                            export_folder + "%s/%s" % sanitize_txt(site_path, item.tag)
+                        )
+
+                    with open(
+                        export_folder
+                        + "%s/%s/%s - %s.bes"
+                        % sanitize_txt(
+                            site_path,
+                            item.tag,
+                            item.ID,
+                            # http://stackoverflow.com/questions/2872512/python-truncate-a-long-string
+                            # trimming to 150 worked in most cases, but recently even that had issues.
+                            # now trimmed to first name_trim characters of the title of the item.
+                            item.Name.text[:name_trim],
+                        ),
+                        "wb",
+                    ) as bes_file:
+                        bes_file.write(content.text.encode("utf-8"))
+
     __call__ = login
+    # https://stackoverflow.com/q/40536821/861745
+    __enter__ = login
+    __exit__ = logout
 
 
 class RESTResult:
+    """BigFix REST API Result Abstraction Class"""
+
     def __init__(self, request):
         self.request = request
         self.text = request.text
@@ -104,6 +279,7 @@ class RESTResult:
             if self.validate_xsd(request.text):
                 self.valid = True
             else:
+                # print("WARNING: response appears invalid")
                 self.valid = False
 
     def __str__(self):
@@ -111,7 +287,7 @@ class RESTResult:
             # I think this is needed for python3 compatibility:
             try:
                 return self.besxml.decode("utf-8")
-            except:
+            except BaseException:
                 return self.besxml
         else:
             return self.text
@@ -121,6 +297,7 @@ class RESTResult:
 
     @property
     def besxml(self):
+        """property for parsed xml representation"""
         if self.valid and self._besxml is None:
             self._besxml = self.xmlparse_text(self.text)
 
@@ -128,15 +305,17 @@ class RESTResult:
 
     @property
     def besobj(self):
+        """property for xml object representation"""
         if self.valid and self._besobj is None:
             self._besobj = self.objectify_text(self.text)
 
         return self._besobj
 
     def validate_xsd(self, doc):
+        """validate results using XML XSDs"""
         try:
             xmldoc = etree.fromstring(doc)
-        except:
+        except BaseException:
             return False
 
         for xsd in ["BES.xsd", "BESAPI.xsd", "BESActionSettings.xsd"]:
@@ -145,8 +324,10 @@ class RESTResult:
             # one schema may throw an error while another will validate
             try:
                 xmlschema = etree.XMLSchema(xmlschema_doc)
-            except etree.XMLSchemaParseError:
-                continue
+            except etree.XMLSchemaParseError as err:
+                # this should only error if the XSD itself is malformed
+                print(f"ERROR with {xsd}: {err}")
+                raise
 
             if xmlschema.validate(xmldoc):
                 return True
@@ -154,7 +335,7 @@ class RESTResult:
         return False
 
     def xmlparse_text(self, text):
-
+        """parse response text as xml"""
         if type(text) is str:
             root_xml = etree.fromstring(text.encode("utf-8"))
         else:
@@ -163,7 +344,7 @@ class RESTResult:
         return etree.tostring(root_xml, encoding="utf-8", xml_declaration=True)
 
     def objectify_text(self, text):
-
+        """parse response text as objectified xml"""
         if type(text) is str:
             root_xml = text.encode("utf-8")
         else:
@@ -173,6 +354,7 @@ class RESTResult:
 
 
 def main():
+    """if invoked directly, run bescli command loop"""
     # pylint: disable=import-outside-toplevel
     try:
         from bescli import bescli

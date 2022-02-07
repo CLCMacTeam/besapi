@@ -23,17 +23,24 @@ on:
 
 jobs:
   test_build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        # https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json
+        python-version: ["3.8"]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
-      - name: Install requirements
-        run: if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          python-version: ${{ matrix.python-version }}
       - name: Install build tools
         run: pip install setuptools wheel build
+      - name: Install requirements
+        run: if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Run Tests - Source
+        run: python tests/tests.py
       - name: Run build
         run: python3 -m build
       - name: Get Wheel File Path
@@ -48,4 +55,9 @@ jobs:
         run: python -c "import besapi"
       - name: Test python import bescli
         shell: bash
-        run: python -c "import besapi"
+        run: python -c "import bescli"
+      - name: Test python bescli
+        shell: bash
+        run: python -m bescli ls logout clear error_count exit
+      - name: Run Tests - Pip
+        run: python tests/tests.py --test_pip
