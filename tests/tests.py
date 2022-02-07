@@ -50,6 +50,8 @@ if bigfix_cli.bes_conn:
     # set working directory to src folder in parent folder
     os.chdir("../src")
 
+    # Test file upload: print(bigfix_cli.bes_conn.upload("./besapi/__init__.py", "test_file.txt"))
+
     if os.name == "nt":
         subprocess.run(
             'CMD /C python -m besapi ls clear ls conf "query number of bes computers" version error_count exit',

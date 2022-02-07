@@ -8,7 +8,7 @@ Enhancements by James Stewart since 2021
 Library for communicating with the BES (BigFix) REST API.
 """
 
-import os.path
+import os
 import site
 import string
 
@@ -172,6 +172,26 @@ class BESConnection:
         """clear session and close it"""
         self.session.cookies.clear()
         self.session.close()
+
+    def upload(self, file_path, file_name=None):
+        """
+        upload a single file
+        https://developer.bigfix.com/rest-api/api/upload.html
+        """
+        # TODO: test this function
+
+        if not os.access(file_path, os.R_OK):
+            print(file_path, "is not readable")
+            raise FileNotFoundError
+
+        # if file_name not specified, then get it from tail of file_path
+        if not file_name:
+            file_name = os.path.basename(file_path)
+
+        # Example Header::  Content-Disposition: attachment; filename="file.xml"
+        headers = {"Content-Disposition": f'attachment; filename="{file_name}"'}
+        with open(file_path, "rb") as f:
+            return self.post(self.url("upload"), data=f, headers=headers)
 
     def export_site_contents(
         self, site_path, export_folder="./", name_trim=70, verbose=False
