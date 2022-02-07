@@ -178,8 +178,6 @@ class BESConnection:
         upload a single file
         https://developer.bigfix.com/rest-api/api/upload.html
         """
-        # TODO: test this function
-
         if not os.access(file_path, os.R_OK):
             print(file_path, "is not readable")
             raise FileNotFoundError
