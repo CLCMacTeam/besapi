@@ -23,4 +23,5 @@ setup(
     install_requires=["requests", "lxml", "cmd2"],
     include_package_data=True,
     package_dir={"": "src"},
+    # install_requires={':python_version < "3.0"': ["future-fstrings",],},
 )

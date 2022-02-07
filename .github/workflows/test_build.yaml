@@ -23,19 +23,24 @@ on:
 
 jobs:
   test_build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        # https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json
+        python-version: ["3.8"]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: ${{ matrix.python-version }}
+      - name: Install build tools
+        run: pip install setuptools wheel build
       - name: Install requirements
         run: if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Run Tests - Source
         run: python tests/tests.py
-      - name: Install build tools
-        run: pip install setuptools wheel build
       - name: Run build
         run: python3 -m build
       - name: Get Wheel File Path

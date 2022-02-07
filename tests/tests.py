@@ -1,6 +1,8 @@
+#!/usr/bin/env python
 """
 Test besapi
 """
+
 import argparse
 import os
 import subprocess
@@ -25,7 +27,7 @@ import besapi
 import bescli
 
 
-print(f"besapi version: {besapi.__version__}")
+print("besapi version: " + str(besapi.__version__))
 
 bigfix_cli = bescli.bescli.BESCLInterface()
 

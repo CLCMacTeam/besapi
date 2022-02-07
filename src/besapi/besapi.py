@@ -11,7 +11,11 @@ Library for communicating with the BES (BigFix) REST API.
 import os.path
 import site
 import string
-import urllib.parse
+
+try:
+    from urllib import parse
+except ImportError:
+    from urlparse import parse_qs as parse
 
 import requests
 from lxml import etree, objectify
@@ -123,7 +127,7 @@ class BESConnection:
         return RESTResult(
             self.session.post(
                 self.url("query"),
-                data=f"relevance={urllib.parse.quote(relevance, safe=':+')}",
+                data=f"relevance={parse.quote(relevance, safe=':+')}",
                 verify=self.verify,
                 **kwargs,
             )
