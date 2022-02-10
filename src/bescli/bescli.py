@@ -300,6 +300,10 @@ class BESCLInterface(Cmd):
         """export site contents to current folder"""
         self.bes_conn.export_site_contents(site_path, verbose=True)
 
+    def do_export_all_sites(self, statement=None):
+        """export site contents to current folder"""
+        self.bes_conn.export_all_sites(verbose=False)
+
     complete_upload = Cmd.path_complete
 
     def do_upload(self, file_path):

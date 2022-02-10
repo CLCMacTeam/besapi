@@ -203,6 +203,8 @@ class BESConnection:
             print("export_site_contents()")
         # Iterate Over All Site Content
         content = self.get("site/" + site_path + "/content")
+        if verbose:
+            print(content)
         if content.request.status_code == 200:
             print(
                 "Archiving %d items from %s..." % (content().countchildren(), site_path)
@@ -250,6 +252,22 @@ class BESConnection:
                         "wb",
                     ) as bes_file:
                         bes_file.write(content.text.encode("utf-8"))
+
+    def export_all_sites(
+        self, include_external=False, export_folder="./", name_trim=70, verbose=False
+    ):
+        """export all bigfix sites to a folder"""
+        results_sites = self.get("sites")
+        if verbose:
+            print(results_sites)
+        if results_sites.request.status_code == 200:
+            for item in results_sites().iterchildren():
+                site_path = item.attrib["Resource"].split("/api/site/", 1)[1]
+                if include_external or "external/" not in site_path:
+                    print("Exporting Site:", site_path)
+                    self.export_site_contents(
+                        site_path, export_folder, name_trim, verbose
+                    )
 
     __call__ = login
     # https://stackoverflow.com/q/40536821/861745
