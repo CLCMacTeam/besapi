@@ -11,6 +11,7 @@ Library for communicating with the BES (BigFix) REST API.
 import os
 import site
 import string
+import urllib3.poolmanager
 
 try:
     from urllib import parse
@@ -39,6 +40,41 @@ def sanitize_txt(*args):
         )
 
     return tuple(sani_args)
+
+
+# https://docs.python-requests.org/en/latest/user/advanced/#transport-adapters
+class HTTPAdapterBiggerBlocksize(requests.adapters.HTTPAdapter):
+    """custom HTTPAdapter for requests to override blocksize
+    for Uploading or Downloading large files"""
+
+    # override inti_poolmanager from regular HTTPAdapter
+    # https://stackoverflow.com/questions/22915295/python-requests-post-and-big-content/22915488#comment125583017_22915488
+    def init_poolmanager(self, connections, maxsize, block=False, **pool_kwargs):
+        """Initializes a urllib3 PoolManager.
+
+        This method should not be called from user code, and is only
+        exposed for use when subclassing the
+        :class:`HTTPAdapter <requests.adapters.HTTPAdapter>`.
+
+        :param connections: The number of urllib3 connection pools to cache.
+        :param maxsize: The maximum number of connections to save in the pool.
+        :param block: Block when no free connections are available.
+        :param pool_kwargs: Extra keyword arguments used to initialize the Pool Manager.
+        """
+        # save these values for pickling
+        self._pool_connections = connections
+        self._pool_maxsize = maxsize
+        self._pool_block = block
+
+        self.poolmanager = urllib3.poolmanager.PoolManager(
+            num_pools=connections,
+            maxsize=maxsize,
+            block=block,
+            # This SHOULD override the blocksize of urllib3 connections
+            blocksize=8 * 1024 * 1024,
+            strict=True,
+            **pool_kwargs,
+        )
 
 
 class BESConnection:
