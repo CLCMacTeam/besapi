@@ -66,12 +66,14 @@ class HTTPAdapterBiggerBlocksize(requests.adapters.HTTPAdapter):
         self._pool_maxsize = maxsize
         self._pool_block = block
 
+        # This doesn't work until urllib3 is updated to a future version:
+        # updating blocksize to be larger:
+        # pool_kwargs["blocksize"] = 8 * 1024 * 1024
+
         self.poolmanager = urllib3.poolmanager.PoolManager(
             num_pools=connections,
             maxsize=maxsize,
             block=block,
-            # This SHOULD override the blocksize of urllib3 connections
-            blocksize=8 * 1024 * 1024,
             strict=True,
             **pool_kwargs,
         )
@@ -201,6 +203,10 @@ class BESConnection:
         """do login"""
         if not self.connected():
             self.get("login").request.raise_for_status()
+
+        # This doesn't work until urllib3 is updated to a future version:
+        # if self.connected():
+        #     self.session.mount(self.url("upload"), HTTPAdapterBiggerBlocksize())
 
         return self.connected()
 
