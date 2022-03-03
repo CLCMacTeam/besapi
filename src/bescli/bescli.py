@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: future_fstrings -*-
 """
 bescli.py
 

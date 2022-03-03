@@ -121,7 +121,7 @@ REST API Help
 Requirements
 ============
 
-- Python 2.7 or later
+- Python 3.6 or later
 - lxml
 - requests
 - cmd2
