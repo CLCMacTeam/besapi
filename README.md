@@ -122,6 +122,7 @@ Requirements
 ============
 
 - Python 3.6 or later
+  - version 1.1.3 of besapi was the last to have partial python2 support
 - lxml
 - requests
 - cmd2
