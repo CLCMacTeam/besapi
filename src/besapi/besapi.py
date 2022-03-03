@@ -13,6 +13,7 @@ import json
 import os
 import site
 import string
+import sys
 
 # import urllib3.poolmanager
 
@@ -448,7 +449,7 @@ class RESTResult:
 
     def xmlparse_text(self, text):
         """parse response text as xml"""
-        if type(text) is str:
+        if sys.version_info[0] >= 3 and type(text) is str:
             root_xml = etree.fromstring(text.encode("utf-8"))
         else:
             root_xml = text
@@ -457,7 +458,7 @@ class RESTResult:
 
     def objectify_text(self, text):
         """parse response text as objectified xml"""
-        if type(text) is str:
+        if sys.version_info[0] >= 3 and type(text) is str:
             root_xml = text.encode("utf-8")
         else:
             root_xml = text
