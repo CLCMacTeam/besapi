@@ -11,7 +11,7 @@ Simple command line interface for the BES (BigFix) REST API.
 import getpass
 import os
 import site
-import sys
+# import sys
 
 import requests.exceptions
 from cmd2 import Cmd
@@ -123,15 +123,12 @@ class BESCLInterface(Cmd):
 
     def do_login(self, user=None):
         """Login to BigFix Server"""
-        # python3 hack:
-        if sys.version_info >= (3, 0):
-            raw_input = input
 
         if not user:
             if self.BES_USER_NAME:
                 user = self.BES_USER_NAME
             else:
-                user = raw_input("User [%s]: " % getpass.getuser())
+                user = str(input("User [%s]: " % getpass.getuser()))
                 if not user:
                     user = getpass.getuser()
 
@@ -143,14 +140,14 @@ class BESCLInterface(Cmd):
         if self.BES_ROOT_SERVER:
             root_server = self.BES_ROOT_SERVER
             if not root_server:
-                root_server = raw_input("Root Server [%s]: " % self.BES_ROOT_SERVER)
+                root_server = str(input("Root Server [%s]: " % self.BES_ROOT_SERVER))
 
             self.BES_ROOT_SERVER = root_server
 
         else:
-            root_server = raw_input(
+            root_server = str(input(
                 "Root Server (ex. %s): " % "https://server.institution.edu:52311"
-            )
+            ))
             if root_server:
                 self.BES_ROOT_SERVER = root_server
                 if not self.CONFPARSER.has_section("besapi"):
