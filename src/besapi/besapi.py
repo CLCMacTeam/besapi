@@ -198,7 +198,7 @@ class BESConnection:
                 self.url("query"),
                 data=f"relevance={parse.quote(relevance, safe=':+')}",
                 verify=self.verify,
-                **kwargs,
+                **kwargs
             )
         )
 
