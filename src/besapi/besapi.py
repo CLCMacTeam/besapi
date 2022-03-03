@@ -198,7 +198,7 @@ class BESConnection:
                 self.url("query"),
                 data=f"relevance={parse.quote(relevance, safe=':+')}",
                 verify=self.verify,
-                **kwargs
+                **kwargs,
             )
         )
 
@@ -320,7 +320,7 @@ class BESConnection:
                             # http://stackoverflow.com/questions/2872512/python-truncate-a-long-string
                             # trimming to 150 worked in most cases, but recently even that had issues.
                             # now trimmed to first name_trim characters of the title of the item.
-                            item.Name.text[:name_trim]
+                            item.Name.text[:name_trim],
                         ),
                         "wb",
                     ) as bes_file:

@@ -5,7 +5,7 @@
   },
   "python.formatting.provider": "black",
   "python.autoComplete.addBrackets": true,
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "git.autofetch": true,
   "python.analysis.completeFunctionParens": true
 }

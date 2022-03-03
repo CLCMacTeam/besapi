@@ -22,5 +22,5 @@ setup(
     package_data={"besapi": ["schemas/*.xsd"]},
     install_requires=["requests", "lxml", "cmd2"],
     include_package_data=True,
-    package_dir={"": "src"}
+    package_dir={"": "src"},
 )
