@@ -24,10 +24,29 @@ if not args.test_pip:
     sys.path.reverse()
 
 import besapi
-import bescli
-
 
 print("besapi version: " + str(besapi.__version__))
+
+# fake result:
+class RequestResult(object):
+    text = "this is just a test"
+    headers = []
+
+
+request_result = RequestResult()
+rest_result = besapi.besapi.RESTResult(request_result)
+
+print(rest_result.besdict)
+print(rest_result.besjson)
+print(rest_result.xmlparse_text("<BES>Example</BES>"))
+
+assert rest_result.text == "this is just a test"
+
+if sys.version_info[0] < 3:
+    print("bescli doesn't work with python2 currently")
+    sys.exit(0)
+
+import bescli
 
 bigfix_cli = bescli.bescli.BESCLInterface()
 

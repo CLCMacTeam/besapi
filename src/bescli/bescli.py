@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: future_fstrings -*-
 """
 bescli.py
 
@@ -64,6 +65,8 @@ class BESCLInterface(Cmd):
                 output_item = self.bes_conn.get(line)
                 # print(type(output_item))
                 print(output_item)
+                # print(output_item.besdict)
+                # print(output_item.besjson)
         else:
             self.pfeedback("Not currently logged in. Type 'login'.")
 

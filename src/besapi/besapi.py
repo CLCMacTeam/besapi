@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: future_fstrings -*-
 """
 besapi.py
 
@@ -8,10 +9,12 @@ Enhancements by James Stewart since 2021
 Library for communicating with the BES (BigFix) REST API.
 """
 
+import json
 import os
 import site
 import string
-import urllib3.poolmanager
+
+# import urllib3.poolmanager
 
 try:
     from urllib import parse
@@ -42,41 +45,69 @@ def sanitize_txt(*args):
     return tuple(sani_args)
 
 
-# https://docs.python-requests.org/en/latest/user/advanced/#transport-adapters
-class HTTPAdapterBiggerBlocksize(requests.adapters.HTTPAdapter):
-    """custom HTTPAdapter for requests to override blocksize
-    for Uploading or Downloading large files"""
+def elem2dict(node):
+    """
+    Convert an lxml.etree node tree into a dict.
+    https://gist.github.com/jacobian/795571?permalink_comment_id=2981870#gistcomment-2981870
+    """
+    result = {}
 
-    # override inti_poolmanager from regular HTTPAdapter
-    # https://stackoverflow.com/questions/22915295/python-requests-post-and-big-content/22915488#comment125583017_22915488
-    def init_poolmanager(self, connections, maxsize, block=False, **pool_kwargs):
-        """Initializes a urllib3 PoolManager.
+    for element in node.iterchildren():
+        # Remove namespace prefix
+        key = element.tag.split("}")[1] if "}" in element.tag else element.tag
 
-        This method should not be called from user code, and is only
-        exposed for use when subclassing the
-        :class:`HTTPAdapter <requests.adapters.HTTPAdapter>`.
+        # Process element as tree element if the inner XML contains non-whitespace content
+        if element.text and element.text.strip():
+            value = element.text
+        else:
+            value = elem2dict(element)
+        if key in result:
 
-        :param connections: The number of urllib3 connection pools to cache.
-        :param maxsize: The maximum number of connections to save in the pool.
-        :param block: Block when no free connections are available.
-        :param pool_kwargs: Extra keyword arguments used to initialize the Pool Manager.
-        """
-        # save these values for pickling
-        self._pool_connections = connections
-        self._pool_maxsize = maxsize
-        self._pool_block = block
+            if type(result[key]) is list:
+                result[key].append(value)
+            else:
+                tempvalue = result[key].copy()
+                result[key] = [tempvalue, value]
+        else:
+            result[key] = value
+    return result
 
-        # This doesn't work until urllib3 is updated to a future version:
-        # updating blocksize to be larger:
-        # pool_kwargs["blocksize"] = 8 * 1024 * 1024
 
-        self.poolmanager = urllib3.poolmanager.PoolManager(
-            num_pools=connections,
-            maxsize=maxsize,
-            block=block,
-            strict=True,
-            **pool_kwargs,
-        )
+# # https://docs.python-requests.org/en/latest/user/advanced/#transport-adapters
+# class HTTPAdapterBiggerBlocksize(requests.adapters.HTTPAdapter):
+#     """custom HTTPAdapter for requests to override blocksize
+#     for Uploading or Downloading large files"""
+
+#     # override inti_poolmanager from regular HTTPAdapter
+#     # https://stackoverflow.com/questions/22915295/python-requests-post-and-big-content/22915488#comment125583017_22915488
+#     def init_poolmanager(self, connections, maxsize, block=False, **pool_kwargs):
+#         """Initializes a urllib3 PoolManager.
+
+#         This method should not be called from user code, and is only
+#         exposed for use when subclassing the
+#         :class:`HTTPAdapter <requests.adapters.HTTPAdapter>`.
+
+#         :param connections: The number of urllib3 connection pools to cache.
+#         :param maxsize: The maximum number of connections to save in the pool.
+#         :param block: Block when no free connections are available.
+#         :param pool_kwargs: Extra keyword arguments used to initialize the Pool Manager.
+#         """
+#         # save these values for pickling
+#         self._pool_connections = connections
+#         self._pool_maxsize = maxsize
+#         self._pool_block = block
+
+#         # This doesn't work until urllib3 is updated to a future version:
+#         # updating blocksize to be larger:
+#         # pool_kwargs["blocksize"] = 8 * 1024 * 1024
+
+#         self.poolmanager = urllib3.poolmanager.PoolManager(
+#             num_pools=connections,
+#             maxsize=maxsize,
+#             block=block,
+#             strict=True,
+#             **pool_kwargs,
+#         )
 
 
 class BESConnection:
@@ -289,7 +320,7 @@ class BESConnection:
                             # http://stackoverflow.com/questions/2872512/python-truncate-a-long-string
                             # trimming to 150 worked in most cases, but recently even that had issues.
                             # now trimmed to first name_trim characters of the title of the item.
-                            item.Name.text[:name_trim],
+                            item.Name.text[:name_trim]
                         ),
                         "wb",
                     ) as bes_file:
@@ -325,6 +356,8 @@ class RESTResult:
         self.text = request.text
         self._besxml = None
         self._besobj = None
+        self._besdict = None
+        self._besjson = None
 
         if (
             "content-type" in request.headers
@@ -370,6 +403,25 @@ class RESTResult:
             self._besobj = self.objectify_text(self.text)
 
         return self._besobj
+
+    @property
+    def besdict(self):
+        """property for python dict representation"""
+        if self._besdict is None:
+            if self.valid:
+                self._besdict = elem2dict(etree.fromstring(self.besxml))
+            else:
+                self._besdict = {"text": str(self)}
+
+        return self._besdict
+
+    @property
+    def besjson(self):
+        """property for json representation"""
+        if self._besjson is None:
+            self._besjson = json.dumps(self.besdict, indent=2)
+
+        return self._besjson
 
     def validate_xsd(self, doc):
         """validate results using XML XSDs"""
