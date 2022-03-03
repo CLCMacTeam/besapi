@@ -27,7 +27,7 @@ import besapi
 
 print("besapi version: " + str(besapi.__version__))
 
-# fake result:
+
 class RequestResult(object):
     text = "this is just a test"
     headers = []
