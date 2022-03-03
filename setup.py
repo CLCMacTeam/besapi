@@ -20,8 +20,7 @@ setup(
     # long_description= moved to setup.cfg
     packages=["besapi", "bescli"],
     package_data={"besapi": ["schemas/*.xsd"]},
-    install_requires=["requests", "lxml", "cmd2", "future-fstrings"],
+    install_requires=["requests", "lxml", "cmd2"],
     include_package_data=True,
     package_dir={"": "src"}
-    # install_requires={':python_version < "3.0"': ["future-fstrings",],},
 )
