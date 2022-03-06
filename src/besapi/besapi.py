@@ -12,7 +12,6 @@ import json
 import os
 import site
 import string
-import sys
 
 # import urllib3.poolmanager
 
@@ -246,6 +245,38 @@ class BESConnection:
         self.session.cookies.clear()
         self.session.close()
 
+    def get_user(self, user_name):
+        """get a user"""
+
+        result_users = self.get(f"operator/{user_name}")
+
+        if result_users and "Operator does not exist" not in str(result_users):
+            return result_users
+
+    def create_user_from_file(self, bes_file_path):
+        """create user from xml"""
+        xml_parsed = etree.parse(bes_file_path)
+        new_user_name = xml_parsed.xpath("/BESAPI/Operator/Name/text()")[0]
+        result_user = self.get_user(new_user_name)
+
+        if result_user:
+            print(f"WARNING: User Already Exists: {new_user_name}")
+            return result_user
+        print(f"Creating User {new_user_name}")
+        _ = self.post("operators", etree.tostring(xml_parsed))
+        # print(user_result)
+        return self.get_user(new_user_name)
+
+    def get_computergroup(self, group_name, site_path="master"):
+        """get computer group resource URI"""
+
+        result_groups = self.get(f"computergroups/{site_path}")
+
+        for group in result_groups.besobj.ComputerGroup:
+            if group_name == str(group.Name):
+                print(f"Found Group With Resource: { group.attrib['Resource'] }")
+                return group
+
     def upload(self, file_path, file_name=None):
         """
         upload a single file
@@ -345,7 +376,6 @@ class BESConnection:
     __call__ = login
     # https://stackoverflow.com/q/40536821/861745
     __enter__ = login
-    __exit__ = logout
 
 
 class RESTResult:
