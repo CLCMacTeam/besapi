@@ -94,7 +94,7 @@ OR
 BES> login
 User [mah60]: mah60
 Root Server (ex. https://server.institution.edu:52311): https://my.company.org:52311
-Password: 
+Password:
 Login Successful!
 BES> get help
 ...

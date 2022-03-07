@@ -14,8 +14,8 @@
         <xs:element name="Baseline" type="Baseline"/>
         <xs:element name="ComputerGroup" type="ComputerGroup"/>
         <xs:element name="CustomSite" type="Site"/>
-        <xs:element name="ActionSite" type="Site"/>        
-        
+        <xs:element name="ActionSite" type="Site"/>
+
         <xs:element name="ExternalSite">
           <xs:complexType>
             <xs:complexContent>
@@ -165,9 +165,9 @@
   <xs:complexType name="SourcedFixletAction">
     <xs:sequence>
       <xs:element name="SourceFixlet" type="BESActionSourceFixlet" />
-      <xs:element name="Target" type="BESActionTarget" minOccurs="0" />      
+      <xs:element name="Target" type="BESActionTarget" minOccurs="0" />
       <xs:element name="Parameter" type="BESActionParameter" minOccurs="0" maxOccurs="unbounded" />
-      <xs:element name="SecureParameter" type="BESActionParameter" minOccurs="0" maxOccurs="unbounded" />      
+      <xs:element name="SecureParameter" type="BESActionParameter" minOccurs="0" maxOccurs="unbounded" />
       <xs:element name="Settings" type="ActionSettings" minOccurs="0" />
       <xs:element name="IsUrgent" type="xs:boolean" minOccurs="0" />
       <xs:element name="Title" type="ObjectName" minOccurs="0" />
@@ -183,7 +183,7 @@
           <xs:element name="SettingsLocks" type="ActionSettingsLocks" minOccurs="0" />
           <xs:element name="IsUrgent" type="xs:boolean" minOccurs="0" />
           <xs:element name="SkipLockedConstraint" type="xs:boolean" minOccurs="0" />
-          <xs:element name="Domain" type="Domain" minOccurs="0" />          
+          <xs:element name="Domain" type="Domain" minOccurs="0" />
           <xs:element name="Target" type="BESActionTarget" minOccurs="0" />
           <xs:element name="SourceFixlet" type="BESActionSourceFixlet" minOccurs="0" />
           <xs:element name="MIMEFieldSingleAction" type="MIMEFieldType" minOccurs="0" maxOccurs="unbounded" />
@@ -507,7 +507,7 @@
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
-  
+
   <xs:element name="ActionSettings">
 		<xs:complexType>
 			<xs:sequence>
@@ -556,14 +556,14 @@
 						<!--
 							Use DeadlineOffset to specify the pre-action deadline using GMT as the reference time.
 							Use DeadlineLocalOffset to specify the pre-action deadline using local time as the reference time.
-							
+
 							These are set according to the ISO 8601 specification.
-							
+
 							For example, suppose it's January 1, 12:00 local time and your time zone is GMT-8.
-							
+
 							"DeadlineOffset = P1DT2H" sets the deadline to January 2, 22:00.
 							"DeadlineLocalOffset = P1DT2H" sets the deadline to January 2, 14:00.
-							
+
 							You probably want to use DeadlineLocalOffset, which was added in 8.1 patch #2.
 						-->
 						<xs:choice>
@@ -597,14 +597,14 @@
 			<!--
 				Use StartDateTimeOffset to specify the start time using GMT as the reference time.
 				Use StartDateTimeLocalOffset to specify the start time using local time as the reference time.
-				
+
 				These are set according to the ISO 8601 specification.
-				
+
 				For example, suppose it's January 1, 12:00 local time and your time zone is GMT-8.
-				
+
 				"StartDateTimeOffset = P1DT2H" sets the start time to January 2, 22:00.
 				"StartDateTimeLocalOffset = P1DT2H" sets the start time to January 2, 14:00.
-				
+
 				You probably want to use StartDateTimeLocalOffset, which was added in 8.1 patch #2.
 
 				Use StartDateTime to specify the exact start time using GMT as the reference time.
@@ -622,14 +622,14 @@
 			<!--
 				Use EndDateTimeOffset to specify the end time using GMT as the reference time.
 				Use EndDateTimeLocalOffset to specify the end time using local time as the reference time.
-				
+
 				These are set according to the ISO 8601 specification.
-				
+
 				For example, suppose it's January 1, 12:00 local time and your time zone is GMT-8.
-				
+
 				"EndDateTimeOffset = P1DT2H" sets the end time to January 2, 22:00.
 				"EndDateTimeLocalOffset = P1DT2H" sets the end time to January 2, 14:00.
-				
+
 				You probably want to use EndDateTimeLocalOffset, which was added in 8.1 patch #2.
 
 				Use EndDateTime to specify the exact end time using GMT as the reference time.
@@ -825,7 +825,7 @@
 			<xs:element name="Whose" type="xs:boolean" minOccurs="0" />
 
 			<xs:element name="PreActionCacheDownload" type="xs:boolean" minOccurs="0" />
-			<!-- 
+			<!--
 				 In 7.1 the reapply options in the Console UI were changed to a choice of { NoReapply, PolicyReapply, PeriodicReapply },
 				 where PeriodicReapply implies that a reapply interval exists.  The "ReapplyInterval" lock was removed because of this new organization.
 				 For backward-compatibility, if "ReapplyInterval" is locked, then "Reapply" will be locked.

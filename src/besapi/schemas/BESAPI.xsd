@@ -9,9 +9,9 @@
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="Name" type="xs:normalizedString" minOccurs="0"/>
-							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>							
+							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
@@ -25,7 +25,7 @@
 				   			<xs:element name="ReplicationIntervalSeconds" type="xs:nonNegativeInteger" minOccurs="0"/>
 				   			<xs:element name="ReplicationLink" type="ReplicationLinkType" minOccurs="0" maxOccurs="unbounded"/>
 			   			</xs:sequence>
-			   			<xs:attribute name="Resource" type="xs:normalizedString"/> 
+			   			<xs:attribute name="Resource" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
 
@@ -37,7 +37,7 @@
 							<xs:element name="Name" type="xs:normalizedString" minOccurs="0"/>
 							<xs:element name="ID" type="xs:nonNegativeInteger"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
@@ -50,7 +50,7 @@
 							<xs:element name="Size" type="xs:nonNegativeInteger"/>
 							<xs:element name="SHA1" type="xs:normalizedString"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString"/> 
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
 
@@ -66,11 +66,11 @@
 										<xs:element name="ActionID" type="xs:nonNegativeInteger"/>
 										<xs:element name="Computer" type="ComputerResultType" minOccurs="0" maxOccurs="unbounded"/>
 									</xs:sequence>
-									<xs:attribute name="Resource" type="xs:normalizedString"/>  
+									<xs:attribute name="Resource" type="xs:normalizedString"/>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString"/>  						
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
 
@@ -78,9 +78,9 @@
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="Name" type="xs:normalizedString"/>
-							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>							
+							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
@@ -91,18 +91,18 @@
 							<xs:element name="Name" type="xs:normalizedString"/>
 							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
-				</xs:element>				
+				</xs:element>
 
 				<xs:element name="Task">
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="Name" type="xs:normalizedString" minOccurs="0"/>
-							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>							
+							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
@@ -114,7 +114,7 @@
 							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 							<xs:element name="IsReserved" type="xs:boolean" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
@@ -125,7 +125,7 @@
 							<xs:element name="Name" type="xs:normalizedString"/>
 							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 						</xs:choice>
-						<xs:attribute name="Resource" type="xs:normalizedString"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
@@ -136,7 +136,7 @@
 							<xs:element name="Name" type="xs:normalizedString"/>
 							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 						</xs:choice>
-						<xs:attribute name="Resource" type="xs:normalizedString"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
@@ -147,10 +147,10 @@
 							<xs:element name="Name" type="xs:normalizedString"/>
 							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 						</xs:choice>
-						<xs:attribute name="Resource" type="xs:string"/>  
+						<xs:attribute name="Resource" type="xs:string"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
-				</xs:element>	
+				</xs:element>
 
 				<xs:element name="Computer">
 					<xs:complexType>
@@ -165,14 +165,14 @@
 												<xs:attribute name="Name" type="ObjectName" use="required" />
 											</xs:extension>
 										</xs:simpleContent>
-									</xs:complexType>              
+									</xs:complexType>
 								</xs:element>
 								<xs:element name="Setting" type="ComputerSetting" minOccurs="0" maxOccurs="unbounded"/>
 							</xs:choice>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:string"/>  
+						<xs:attribute name="Resource" type="xs:string"/>
 					</xs:complexType>
-				</xs:element>	
+				</xs:element>
 
 				<xs:element name="ComputerSettings">
 					<xs:complexType>
@@ -186,9 +186,9 @@
 							</xs:element>
 							<xs:element name="Setting" type="ComputerSetting" minOccurs="0" maxOccurs="unbounded"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:string"/>  
+						<xs:attribute name="Resource" type="xs:string"/>
 					</xs:complexType>
-				</xs:element>	
+				</xs:element>
 
 				<xs:element name="AdminField">
 					<xs:complexType>
@@ -196,9 +196,9 @@
 							<xs:element name="Name" type="xs:normalizedString" minOccurs="0"/>
 							<xs:element name="Value" type="xs:normalizedString" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:string"/>  
+						<xs:attribute name="Resource" type="xs:string"/>
 					</xs:complexType>
-				</xs:element>	
+				</xs:element>
 
 				<xs:element name="DashboardData">
 					<xs:complexType>
@@ -209,7 +209,7 @@
 							<xs:element name="User" type="xs:normalizedString" minOccurs="0"/>
 							<xs:element name="Value" type="xs:string" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:string"/>  
+						<xs:attribute name="Resource" type="xs:string"/>
 					</xs:complexType>
 				</xs:element>
 
@@ -222,8 +222,8 @@
 							<xs:element name="FileSize" type="xs:nonNegativeInteger" minOccurs="0"/>
 							<xs:element name="IsClientFile" type="xs:boolean" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:string"/>  
-						<xs:attribute name="LastModified" type="xs:normalizedString"/>						
+						<xs:attribute name="Resource" type="xs:string"/>
+						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
 
@@ -234,7 +234,7 @@
 							<xs:element name="Details" type="xs:normalizedString" minOccurs="0"/>
 							<xs:element name="KeySize" type="EncryptionKeySizeType" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString" use="required"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString" use="required"/>
 					</xs:complexType>
 				</xs:element>
 
@@ -244,8 +244,8 @@
 							<xs:element name="MinimumRefreshSeconds" type="xs:nonNegativeInteger" minOccurs="0"/>
 							<xs:element name="DefaultFixletVisibility" type="DefaultFixletVisibilityType" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString" use="required"/>  
-					</xs:complexType>					
+						<xs:attribute name="Resource" type="xs:normalizedString" use="required"/>
+					</xs:complexType>
 				</xs:element>
 
 				<xs:element name="ComputerGroup">
@@ -254,10 +254,10 @@
 							<xs:element name="Name" type="xs:normalizedString"/>
 							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString" use="required"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString" use="required"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
-				</xs:element>	
+				</xs:element>
 
 				<xs:element name="Operator" type="Operator"/>
 
@@ -267,7 +267,7 @@
 							<xs:element name="Name" type="xs:normalizedString"/>
 							<xs:element name="DisplayName" type="xs:normalizedString" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:string" use="required"/>  
+						<xs:attribute name="Resource" type="xs:string" use="required"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
@@ -276,9 +276,9 @@
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="Name" type="xs:normalizedString"/>
-							<xs:element name="DisplayName" type="xs:normalizedString" minOccurs="0"/>						
+							<xs:element name="DisplayName" type="xs:normalizedString" minOccurs="0"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:string" use="required"/>  
+						<xs:attribute name="Resource" type="xs:string" use="required"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
 				</xs:element>
@@ -288,10 +288,10 @@
 						<xs:sequence>
 							<xs:element name="Name" type="xs:normalizedString"/>
 						</xs:sequence>
-						<xs:attribute name="Resource" type="xs:normalizedString" use="required"/>  
+						<xs:attribute name="Resource" type="xs:normalizedString" use="required"/>
 						<xs:attribute name="LastModified" type="xs:normalizedString"/>
 					</xs:complexType>
-				</xs:element>				
+				</xs:element>
 
 				<xs:element name="Role" type="Role"/>
 
@@ -317,12 +317,12 @@
 						</xs:sequence>
 						<xs:attribute name="Resource" type="xs:normalizedString"/>
 					</xs:complexType>
-				</xs:element>				
+				</xs:element>
 
 				<xs:element name="LDAPDirectory">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>							
+							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 							<xs:element name="Name" type="xs:normalizedString" minOccurs="0"/>
 							<xs:element name="IsActiveDirectory" type="xs:boolean" minOccurs="0"/>
 							<xs:element name="IsGlobalCatalog" type="xs:boolean" minOccurs="0"/>
@@ -337,7 +337,7 @@
 							<xs:element name="Servers" minOccurs="0" maxOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
-										<xs:element name="Server" type="LDAPServer" minOccurs="1" maxOccurs="4"/>	
+										<xs:element name="Server" type="LDAPServer" minOccurs="1" maxOccurs="4"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -349,8 +349,8 @@
 				<xs:element name="ComputerMailboxFile">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="Name" type="xs:normalizedString" minOccurs="0"/>	
-							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>						
+							<xs:element name="Name" type="xs:normalizedString" minOccurs="0"/>
+							<xs:element name="ID" type="xs:nonNegativeInteger" minOccurs="0"/>
 							<xs:element name="SHA1" type="xs:normalizedString" minOccurs="0"/>
 							<xs:element name="Size" type="xs:normalizedString" minOccurs="0"/>
 							<xs:element name="Timestamp" type="xs:normalizedString" minOccurs="0"/>
@@ -395,8 +395,8 @@
 					</xs:complexType>
 				</xs:element>
 
-				<xs:element name="Error" type="xs:string" minOccurs="0" maxOccurs="unbounded"/> 
-				<xs:element name="Warning" type="xs:string" minOccurs="0" maxOccurs="unbounded"/> 
+				<xs:element name="Error" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="Warning" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="ComputerSetting" type="ComputerSetting" minOccurs="0" maxOccurs="1"/>
 
 			</xs:choice>
@@ -439,7 +439,7 @@
    			<xs:element name="LastReplication" type="xs:normalizedString" minOccurs="0"/>
    			<xs:element name="LastError" type="xs:normalizedString" minOccurs="0"/>
    		</xs:sequence>
-   		<xs:attribute name="Resource" type="xs:normalizedString"/> 
+   		<xs:attribute name="Resource" type="xs:normalizedString"/>
    </xs:complexType>
 
 	<xs:complexType name="StringWithReference">
@@ -498,7 +498,7 @@
 			<xs:element name="ApproverRoleID" type="xs:nonNegativeInteger" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="Resource" type="xs:normalizedString"/>
-	</xs:complexType>	
+	</xs:complexType>
 
 	<xs:complexType name="Role">
 		<xs:sequence>
