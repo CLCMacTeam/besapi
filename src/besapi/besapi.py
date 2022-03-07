@@ -9,6 +9,7 @@ Library for communicating with the BES (BigFix) REST API.
 """
 
 import json
+import logging
 import os
 import site
 import string
@@ -253,6 +254,8 @@ class BESConnection:
         if result_users and "Operator does not exist" not in str(result_users):
             return result_users
 
+        logging.info("User `%s` Not Found!", user_name)
+
     def create_user_from_file(self, bes_file_path):
         """create user from xml"""
         xml_parsed = etree.parse(bes_file_path)
@@ -260,7 +263,7 @@ class BESConnection:
         result_user = self.get_user(new_user_name)
 
         if result_user:
-            print(f"WARNING: User Already Exists: {new_user_name}")
+            logging.warning("User `%s` Already Exists!", new_user_name)
             return result_user
         print(f"Creating User {new_user_name}")
         _ = self.post("operators", etree.tostring(xml_parsed))
@@ -274,8 +277,10 @@ class BESConnection:
 
         for group in result_groups.besobj.ComputerGroup:
             if group_name == str(group.Name):
-                print(f"Found Group With Resource: { group.attrib['Resource'] }")
+                logging.info("Found Group With Resource: %s", group.attrib["Resource"])
                 return group
+
+        logging.info("Group `%s` Not Found!", group_name)
 
     def upload(self, file_path, file_name=None):
         """
