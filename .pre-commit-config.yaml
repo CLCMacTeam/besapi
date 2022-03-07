@@ -15,12 +15,12 @@ repos:
       - id: check-ast
       - id: check-case-conflict
       - id: check-merge-conflict
-      # - id: check-xml
-      # - id: end-of-file-fixer
+      - id: check-xml
+      - id: end-of-file-fixer
       # https://www.aleksandrhovhannisyan.com/blog/crlf-vs-lf-normalizing-line-endings-in-git/
       # - id: mixed-line-ending
       #   args: ['--fix=no']
-      # - id: requirements-txt-fixer
+      - id: requirements-txt-fixer
       - id: trailing-whitespace
       #  args: [--markdown-linebreak-ext=md]
       - id: detect-private-key
