@@ -58,8 +58,10 @@ jobs:
         run: python -c "import bescli"
       - name: Test python bescli
         shell: bash
-        run: python -m bescli ls logout clear error_count exit
+        run: python -m bescli ls logout clear error_count version exit
       - name: Run Tests - Pip
         run: python tests/tests.py --test_pip
       - name: Test pyinstaller
-        run: pyinstaller --clean --collect-all besapi --onefile .\src\bescli\bescli.py
+        run: pyinstaller --clean --collect-all besapi --onefile ./src/bescli/bescli.py
+      - name: Test bescli binary
+        run: ./dist/bescli ls logout clear error_count version exit
