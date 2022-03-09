@@ -122,6 +122,11 @@ class BESConnection:
         self.username = username
         self.session = requests.Session()
         self.session.auth = (username, password)
+        # store info on operator used to login
+        # self.operator_info = {}
+
+        # use a sitepath context if none specified when required.
+        self.site_path = "master"
 
         # if not provided, add on https://
         if not rootserver.startswith("http"):
@@ -270,9 +275,11 @@ class BESConnection:
         # print(user_result)
         return self.get_user(new_user_name)
 
-    def get_computergroup(self, group_name, site_path="master"):
+    def get_computergroup(self, group_name, site_path=None):
         """get computer group resource URI"""
 
+        if site_path is None:
+            site_path = self.site_path
         result_groups = self.get(f"computergroups/{site_path}")
 
         for group in result_groups.besobj.ComputerGroup:
@@ -281,6 +288,25 @@ class BESConnection:
                 return group
 
         logging.info("Group `%s` Not Found!", group_name)
+
+    def create_group_from_file(self, bes_file_path, site_path=None):
+        """create a new group"""
+        if site_path is None:
+            site_path = self.site_path
+        xml_parsed = etree.parse(bes_file_path)
+        new_group_name = xml_parsed.xpath("/BES/ComputerGroup/Title/text()")[0]
+
+        existing_group = self.get_computergroup(site_path, new_group_name)
+
+        if existing_group:
+            logging.warning("Group `%s` Already Exists!", new_group_name)
+            return existing_group
+
+        # print(lxml.etree.tostring(xml_parsed))
+
+        _ = self.post(f"computergroups/{site_path}", etree.tostring(xml_parsed))
+
+        return self.get_computergroup(site_path, new_group_name)
 
     def upload(self, file_path, file_name=None):
         """
@@ -301,13 +327,15 @@ class BESConnection:
             return self.post(self.url("upload"), data=f, headers=headers)
 
     def export_site_contents(
-        self, site_path, export_folder="./", name_trim=70, verbose=False
+        self, site_path=None, export_folder="./", name_trim=70, verbose=False
     ):
         """export contents of site
         Originally here:
         - https://gist.github.com/jgstew/1b2da12af59b71c9f88a
         - https://bigfix.me/fixlet/details/21282
         """
+        if site_path is None:
+            site_path = self.site_path
         if verbose:
             print("export_site_contents()")
         # Iterate Over All Site Content

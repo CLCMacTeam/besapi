@@ -10,14 +10,10 @@ Simple command line interface for the BES (BigFix) REST API.
 import getpass
 import os
 import site
+from configparser import ConfigParser as SafeConfigParser
 
 import requests.exceptions
 from cmd2 import Cmd
-
-try:
-    from ConfigParser import SafeConfigParser
-except (ImportError, ModuleNotFoundError):
-    from configparser import SafeConfigParser
 
 try:
     from besapi import besapi
