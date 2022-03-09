@@ -131,8 +131,8 @@ Requirements
 Pyinstaller
 ============
 
-Windows:
-- `pyinstaller --clean --add-data "src/besapi/schemas;besapi/schemas" --onefile .\src\bescli\bescli.py --noconfirm`
+- `pyinstaller --clean --collect-all besapi --onefile .\src\bescli\bescli.py`
+- Note: using UPX to compress the binary only saves 2MB out of 16MB on Windows
 
 Related Items
 =======
