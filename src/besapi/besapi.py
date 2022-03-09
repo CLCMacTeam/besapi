@@ -8,6 +8,7 @@ Enhancements by James Stewart since 2021
 Library for communicating with the BES (BigFix) REST API.
 """
 
+import datetime
 import json
 import logging
 import os
@@ -24,6 +25,9 @@ except ImportError:
 import requests
 from lxml import etree, objectify
 from pkg_resources import resource_filename
+
+logging.basicConfig(level=logging.WARNING)
+besapi_logger = logging.getLogger("besapi")
 
 
 def sanitize_txt(*args):
@@ -137,6 +141,7 @@ class BESConnection:
 
         self.rootserver = rootserver
         self.verify = verify
+        self.connected = None
 
         self.login()
 
@@ -231,25 +236,91 @@ class BESConnection:
         rel_result_array = self.session_relevance_array(relevance, **kwargs)
         return "\n".join(rel_result_array)
 
-    def connected(self):
-        """return true if connected"""
-        return bool(self.get("login").request.status_code == 200)
-
     def login(self):
         """do login"""
-        if not self.connected():
-            self.get("login").request.raise_for_status()
+        if bool(self.connected):
+            duration_obj = datetime.datetime.now() - self.connected
+            duration_minutes = duration_obj / datetime.timedelta(minutes=1)
+            besapi_logger.info(
+                "Connection Time: `%s` - Duration: %d minutes",
+                self.connected,
+                duration_minutes,
+            )
+            if int(duration_minutes) > 3:
+                besapi_logger.info("Refreshing Login to prevent timeout.")
+                self.connected = None
+
+        if not bool(self.connected):
+            result_login = self.get("login")
+            if not result_login.request.status_code == 200:
+                result_login.request.raise_for_status()
+            if result_login.request.status_code == 200:
+                # set time of connection
+                self.connected = datetime.datetime.now()
 
         # This doesn't work until urllib3 is updated to a future version:
         # if self.connected():
         #     self.session.mount(self.url("upload"), HTTPAdapterBiggerBlocksize())
 
-        return self.connected()
+        return bool(self.connected)
 
     def logout(self):
         """clear session and close it"""
         self.session.cookies.clear()
         self.session.close()
+
+    def validate_site_path(self, site_path, site_must_exist=True):
+        """make sure site_path is valid"""
+
+        if site_path is None:
+            raise ValueError("Site Path is `None` - NoneType Error")
+        if str(site_path).strip() == "":
+            raise ValueError("Site Path is empty!")
+
+        site_prefixes = ["external/", "custom/", "operator/", "master"]
+
+        for prefix in site_prefixes:
+            if prefix in site_path:
+                if prefix == "master" and prefix != site_path:
+                    raise ValueError(
+                        f"Site path for master actionsite must be `master` not `{site_path}`"
+                    )
+                if not site_must_exist:
+                    # don't check if site exists first
+                    return site_path
+                else:
+                    # check site exists first
+                    site_result = self.get(f"site/{site_path}")
+                    if site_result.request.status_code != 200:
+                        raise ValueError(f"Site at path `{site_path}` does not exist!")
+
+                    return site_path
+
+        raise ValueError(
+            f"Site Path does not start with a valid prefix! {site_prefixes}"
+        )
+
+    def get_current_site_path(self, site_path=None):
+        """if site_path is none, get current instance site_path,
+        otherwise validate and return provided site_path"""
+
+        # use instance site_path context if none provided:
+        if site_path is None or str(site_path).strip() == "":
+            site_path = self.site_path
+
+        if site_path is None or str(site_path).strip() == "":
+            besapi_logger.error("Site Path context not set and Site Path not provided!")
+            raise ValueError("Site Path context not set and Site Path not provided!")
+
+        # don't check for site's existence when doing basic get
+        return self.validate_site_path(site_path, site_must_exist=False)
+
+    def set_current_site_path(self, site_path):
+        """set current site path context"""
+
+        if self.validate_site_path(site_path):
+            self.site_path = site_path
+            return self.site_path
 
     def get_user(self, user_name):
         """get a user"""
@@ -259,7 +330,7 @@ class BESConnection:
         if result_users and "Operator does not exist" not in str(result_users):
             return result_users
 
-        logging.info("User `%s` Not Found!", user_name)
+        besapi_logger.info("User `%s` Not Found!", user_name)
 
     def create_user_from_file(self, bes_file_path):
         """create user from xml"""
@@ -268,9 +339,9 @@ class BESConnection:
         result_user = self.get_user(new_user_name)
 
         if result_user:
-            logging.warning("User `%s` Already Exists!", new_user_name)
+            besapi_logger.warning("User `%s` Already Exists!", new_user_name)
             return result_user
-        print(f"Creating User {new_user_name}")
+        besapi_logger.info("Creating User `%s`", new_user_name)
         _ = self.post("operators", etree.tostring(xml_parsed))
         # print(user_result)
         return self.get_user(new_user_name)
@@ -278,28 +349,28 @@ class BESConnection:
     def get_computergroup(self, group_name, site_path=None):
         """get computer group resource URI"""
 
-        if site_path is None:
-            site_path = self.site_path
+        site_path = self.get_current_site_path(site_path)
         result_groups = self.get(f"computergroups/{site_path}")
 
         for group in result_groups.besobj.ComputerGroup:
             if group_name == str(group.Name):
-                logging.info("Found Group With Resource: %s", group.attrib["Resource"])
+                besapi_logger.info(
+                    "Found Group With Resource: %s", group.attrib["Resource"]
+                )
                 return group
 
-        logging.info("Group `%s` Not Found!", group_name)
+        besapi_logger.info("Group `%s` Not Found!", group_name)
 
     def create_group_from_file(self, bes_file_path, site_path=None):
         """create a new group"""
-        if site_path is None:
-            site_path = self.site_path
+        site_path = self.get_current_site_path(site_path)
         xml_parsed = etree.parse(bes_file_path)
         new_group_name = xml_parsed.xpath("/BES/ComputerGroup/Title/text()")[0]
 
-        existing_group = self.get_computergroup(site_path, new_group_name)
+        existing_group = self.get_computergroup(new_group_name, site_path)
 
-        if existing_group:
-            logging.warning("Group `%s` Already Exists!", new_group_name)
+        if existing_group is not None:
+            besapi_logger.warning("Group `%s` Already Exists!", new_group_name)
             return existing_group
 
         # print(lxml.etree.tostring(xml_parsed))
@@ -314,7 +385,7 @@ class BESConnection:
         https://developer.bigfix.com/rest-api/api/upload.html
         """
         if not os.access(file_path, os.R_OK):
-            print(file_path, "is not readable")
+            besapi_logger.error(file_path, "is not readable")
             raise FileNotFoundError
 
         # if file_name not specified, then get it from tail of file_path
@@ -334,8 +405,7 @@ class BESConnection:
         - https://gist.github.com/jgstew/1b2da12af59b71c9f88a
         - https://bigfix.me/fixlet/details/21282
         """
-        if site_path is None:
-            site_path = self.site_path
+        site_path = self.get_current_site_path(site_path)
         if verbose:
             print("export_site_contents()")
         # Iterate Over All Site Content
@@ -422,6 +492,22 @@ class RESTResult:
         self._besdict = None
         self._besjson = None
 
+        try:
+            if self.request.status_code == 403:
+                # Error most likely due to not having master operator privs
+                # Could also be due to non-master operator not having specific privs
+                raise PermissionError(
+                    f"\n - HTTP Response Status Code: `403` Forbidden\n - ERROR: `{self.text}`\n - URL: `{self.request.url}`"
+                )
+
+            besapi_logger.info(
+                "HTTP Request Status Code `%d` from URL `%s`",
+                self.request.status_code,
+                self.request.url,
+            )
+        except AttributeError as err:
+            besapi_logger.warning("Error (expected during tests) %s", err)
+
         if (
             "content-type" in request.headers
             and request.headers["content-type"] == "application/xml"
@@ -501,8 +587,8 @@ class RESTResult:
                 xmlschema = etree.XMLSchema(xmlschema_doc)
             except etree.XMLSchemaParseError as err:
                 # this should only error if the XSD itself is malformed
-                print(f"ERROR with {xsd}: {err}")
-                raise
+                besapi_logger.error("ERROR with `%s`: %s", xsd, err)
+                raise err
 
             if xmlschema.validate(xmldoc):
                 return True
@@ -533,7 +619,7 @@ def main():
     # pylint: disable=import-outside-toplevel
     try:
         from bescli import bescli
-    except (ImportError, ModuleNotFoundError):
+    except ImportError:
         site.addsitedir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         from bescli import bescli
     bescli.main()

@@ -8,6 +8,7 @@ Simple command line interface for the BES (BigFix) REST API.
 """
 
 import getpass
+import logging
 import os
 import site
 from configparser import ConfigParser as SafeConfigParser
@@ -159,7 +160,7 @@ class BESCLInterface(Cmd):
         if self.BES_USER_NAME and self.BES_ROOT_SERVER and self.BES_PASSWORD:
             try:
                 self.bes_conn = besapi.BESConnection(
-                    user, self.BES_PASSWORD, root_server
+                    self.BES_USER_NAME, self.BES_PASSWORD, self.BES_ROOT_SERVER
                 )
                 if self.bes_conn.login():
                     self.pfeedback("Login Successful!")
@@ -198,7 +199,8 @@ class BESCLInterface(Cmd):
         """Logout and clear session"""
         if self.bes_conn:
             self.bes_conn.logout()
-            self.bes_conn = None
+            # del self.bes_conn
+            # self.bes_conn = None
         self.pfeedback("Logout Complete!")
 
     def do_debug(self, setting):
@@ -208,12 +210,16 @@ class BESCLInterface(Cmd):
         self.echo = bool(setting)
         self.quiet = bool(setting)
         self.timing = bool(setting)
+        if bool(setting):
+            logging.getLogger("besapi").setLevel(logging.DEBUG)
+        else:
+            logging.getLogger("besapi").setLevel(logging.WARNING)
 
     def do_clear(self, arg=None):
         """clear current config and logout"""
         if self.bes_conn:
             self.bes_conn.logout()
-            self.bes_conn = None
+            # self.bes_conn = None
         if arg and "root" in arg.lower():
             self.pfeedback(" - clearing root server parameter -")
             self.BES_ROOT_SERVER = None
@@ -251,16 +257,20 @@ class BESCLInterface(Cmd):
 
     def do_ls(self, arg=None):
         """List the current settings and connection status"""
+        print("        Connected: " + str(bool(self.bes_conn)))
         print(
-            "BES_ROOT_SERVER: " + (self.BES_ROOT_SERVER if self.BES_ROOT_SERVER else "")
+            "  BES_ROOT_SERVER: "
+            + (self.BES_ROOT_SERVER if self.BES_ROOT_SERVER else "")
         )
-        print("  BES_USER_NAME: " + (self.BES_USER_NAME if self.BES_USER_NAME else ""))
         print(
-            "Password Length: "
+            "    BES_USER_NAME: " + (self.BES_USER_NAME if self.BES_USER_NAME else "")
+        )
+        print(
+            "  Password Length: "
             + str(len(self.BES_PASSWORD if self.BES_PASSWORD else ""))
         )
-        print("      Connected: " + str(bool(self.bes_conn)))
-        print("Config File Path: " + self.conf_path)
+        print("Current Site Path: " + self.bes_conn.get_current_site_path(None))
+        print(" Config File Path: " + self.conf_path)
 
     def do_error_count(self, arg=None):
         """Output the number of errors"""
@@ -290,6 +300,18 @@ class BESCLInterface(Cmd):
         """output version of besapi"""
         self.poutput(f"besapi version: {__version__}")
 
+    def do_get_current_site(self, statement=None):
+        """output current site path context"""
+        self.poutput(
+            f"Current Site Path: `{ self.bes_conn.get_current_site_path(None) }`"
+        )
+
+    def do_set_current_site(self, statement=None):
+        """set current site path context"""
+        self.poutput(
+            f"New Site Path: `{ self.bes_conn.set_current_site_path(statement) }`"
+        )
+
     def do_export_site(self, site_path):
         """export site contents to current folder"""
         self.bes_conn.export_site_contents(site_path, verbose=True)
@@ -306,6 +328,24 @@ class BESCLInterface(Cmd):
             print(file_path, "is not a readable file")
         else:
             print(self.bes_conn.upload(file_path))
+
+    complete_create_group = Cmd.path_complete
+
+    def do_create_group(self, file_path):
+        """create bigfix group from bes file"""
+        if not os.access(file_path, os.R_OK):
+            print(file_path, "is not a readable file")
+        else:
+            print(self.bes_conn.create_group_from_file(file_path))
+
+    complete_create_user = Cmd.path_complete
+
+    def do_create_user(self, file_path):
+        """create bigfix user from bes file"""
+        if not os.access(file_path, os.R_OK):
+            print(file_path, "is not a readable file")
+        else:
+            print(self.bes_conn.create_user_from_file(file_path))
 
 
 def main():
