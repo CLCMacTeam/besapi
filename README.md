@@ -128,6 +128,12 @@ Requirements
 - cmd2
 
 
+Pyinstaller
+============
+
+Windows:
+- `pyinstaller --clean --add-data "src/besapi/schemas;besapi/schemas" --onefile .\src\bescli\bescli.py --noconfirm`
+
 Related Items
 =======
 - https://forum.bigfix.com/t/rest-api-python-module/2170
