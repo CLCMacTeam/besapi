@@ -309,6 +309,7 @@ class BESConnection:
                     # check site exists first
                     site_result = self.get(f"site/{site_path}")
                     if site_result.request.status_code != 200:
+                        besapi_logger.info("Site `%s` does not exist", site_path)
                         if not raise_error:
                             return None
 
@@ -343,6 +344,23 @@ class BESConnection:
         if self.validate_site_path(site_path):
             self.site_path = site_path
             return self.site_path
+
+    def create_site_from_file(self, bes_file_path, site_type="custom"):
+        """create new site"""
+        xml_parsed = etree.parse(bes_file_path)
+        new_site_name = xml_parsed.xpath("/BES/CustomSite/Name/text()")[0]
+
+        result_site_path = self.validate_site_path(
+            site_type + "/" + new_site_name, True, False
+        )
+
+        if result_site_path:
+            besapi_logger.warning("Site `%s` already exists", result_site_path)
+            return None
+
+        result_site = self.post("sites", etree.tostring(xml_parsed))
+
+        return result_site
 
     def get_user(self, user_name):
         """get a user"""

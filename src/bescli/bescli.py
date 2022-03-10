@@ -348,6 +348,15 @@ class BESCLInterface(Cmd):
         else:
             print(self.bes_conn.create_user_from_file(file_path))
 
+    complete_create_site = Cmd.path_complete
+
+    def do_create_site(self, file_path):
+        """create bigfix site from bes file"""
+        if not os.access(file_path, os.R_OK):
+            print(file_path, "is not a readable file")
+        else:
+            print(self.bes_conn.create_site_from_file(file_path))
+
 
 def main():
     """Run the command loop if invoked"""
