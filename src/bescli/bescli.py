@@ -269,8 +269,9 @@ class BESCLInterface(Cmd):
             "  Password Length: "
             + str(len(self.BES_PASSWORD if self.BES_PASSWORD else ""))
         )
-        print("Current Site Path: " + self.bes_conn.get_current_site_path(None))
         print(" Config File Path: " + self.conf_path)
+        if self.bes_conn:
+            print("Current Site Path: " + self.bes_conn.get_current_site_path(None))
 
     def do_error_count(self, arg=None):
         """Output the number of errors"""
