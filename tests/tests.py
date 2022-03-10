@@ -27,6 +27,45 @@ import besapi
 
 print("besapi version: " + str(besapi.__version__))
 
+# test site_path string validation
+assert "master" in besapi.besapi.BESConnection.validate_site_path("", "master", False)
+assert "custom/" in besapi.besapi.BESConnection.validate_site_path(
+    "", "custom/Example", False
+)
+assert "operator/" in besapi.besapi.BESConnection.validate_site_path(
+    "", "operator/Example", False
+)
+
+# start failing tests:
+raised_errors = 0
+
+# failing test:
+try:
+    besapi.besapi.BESConnection.validate_site_path("", "bad/Example", False)
+except ValueError:
+    raised_errors += 1
+
+# failing test:
+try:
+    besapi.besapi.BESConnection.validate_site_path("", "bad/master", False)
+except ValueError:
+    raised_errors += 1
+
+# failing test:
+try:
+    besapi.besapi.BESConnection.validate_site_path("", "", False, True)
+except ValueError:
+    raised_errors += 1
+
+# failing test:
+try:
+    besapi.besapi.BESConnection.validate_site_path("", None, False, True)
+except ValueError:
+    raised_errors += 1
+
+assert raised_errors == 4
+# end failing tests
+
 
 class RequestResult(object):
     text = "this is just a test"
@@ -38,13 +77,9 @@ rest_result = besapi.besapi.RESTResult(request_result)
 
 print(rest_result.besdict)
 print(rest_result.besjson)
-print(rest_result.xmlparse_text("<BES>Example</BES>"))
+assert b"<BES>Example</BES>" in rest_result.xmlparse_text("<BES>Example</BES>")
 
 assert rest_result.text == "this is just a test"
-
-if sys.version_info[0] < 3:
-    print("bescli doesn't work with python2 currently")
-    sys.exit(0)
 
 import bescli
 
@@ -61,8 +96,14 @@ bigfix_cli.do_conf()
 
 # this should really only run if the config file is present:
 if bigfix_cli.bes_conn:
+    # session relevance tests require functioning web reports server
     print(bigfix_cli.bes_conn.session_relevance_string("number of bes computers"))
-
+    assert (
+        "test session relevance string result"
+        in bigfix_cli.bes_conn.session_relevance_string(
+            '"test session relevance string result"'
+        )
+    )
     bigfix_cli.do_set_current_site("master")
 
     # set working directory to folder this file is in:
