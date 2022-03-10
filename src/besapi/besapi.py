@@ -152,7 +152,7 @@ class BESConnection:
 
         self.rootserver = rootserver
         self.verify = verify
-        self.connected = None
+        self.last_connected = None
 
         self.login()
 
@@ -190,30 +190,40 @@ class BESConnection:
 
     def get(self, path="help", **kwargs):
         """HTTP GET request"""
+        self.login()
+        self.last_connected = datetime.datetime.now()
         return RESTResult(
             self.session.get(self.url(path), verify=self.verify, **kwargs)
         )
 
     def post(self, path, data, **kwargs):
         """HTTP POST request"""
+        self.login()
+        self.last_connected = datetime.datetime.now()
         return RESTResult(
             self.session.post(self.url(path), data=data, verify=self.verify, **kwargs)
         )
 
     def put(self, path, data, **kwargs):
         """HTTP PUT request"""
+        self.login()
+        self.last_connected = datetime.datetime.now()
         return RESTResult(
             self.session.put(self.url(path), data=data, verify=self.verify, **kwargs)
         )
 
     def delete(self, path, **kwargs):
         """HTTP DELETE request"""
+        self.login()
+        self.last_connected = datetime.datetime.now()
         return RESTResult(
             self.session.delete(self.url(path), verify=self.verify, **kwargs)
         )
 
     def session_relevance_xml(self, relevance, **kwargs):
         """Get Session Relevance Results XML"""
+        self.login()
+        self.last_connected = datetime.datetime.now()
         return RESTResult(
             self.session.post(
                 self.url("query"),
@@ -249,31 +259,31 @@ class BESConnection:
 
     def login(self):
         """do login"""
-        if bool(self.connected):
-            duration_obj = datetime.datetime.now() - self.connected
+        if bool(self.last_connected):
+            duration_obj = datetime.datetime.now() - self.last_connected
             duration_minutes = duration_obj / datetime.timedelta(minutes=1)
             besapi_logger.info(
                 "Connection Time: `%s` - Duration: %d minutes",
-                self.connected,
+                self.last_connected,
                 duration_minutes,
             )
             if int(duration_minutes) > 3:
                 besapi_logger.info("Refreshing Login to prevent timeout.")
-                self.connected = None
+                self.last_connected = None
 
-        if not bool(self.connected):
+        if not bool(self.last_connected):
             result_login = self.get("login")
             if not result_login.request.status_code == 200:
                 result_login.request.raise_for_status()
             if result_login.request.status_code == 200:
                 # set time of connection
-                self.connected = datetime.datetime.now()
+                self.last_connected = datetime.datetime.now()
 
         # This doesn't work until urllib3 is updated to a future version:
         # if self.connected():
         #     self.session.mount(self.url("upload"), HTTPAdapterBiggerBlocksize())
 
-        return bool(self.connected)
+        return bool(self.last_connected)
 
     def logout(self):
         """clear session and close it"""
