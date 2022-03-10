@@ -50,7 +50,7 @@ def sanitize_txt(*args):
         sani_args.append(
             "".join(
                 c
-                for c in str(arg).replace("/", "-").replace("\\", "-")
+                for c in str(arg).replace("/", "-").replace("\\", "-").replace(" ", "_")
                 if c in valid_chars
             )
             .encode("ascii", "ignore")
@@ -449,8 +449,32 @@ class BESConnection:
         with open(file_path, "rb") as f:
             return self.post(self.url("upload"), data=f, headers=headers)
 
+    def get_content_by_resource(self, resource_url):
+        """get a single content item by resource"""
+        # Get Specific Content
+        content = None
+        try:
+            content = self.get(resource_url.replace("http://", "https://"))
+        except PermissionError as err:
+            logging.error("Could not export item:")
+            logging.error(err)
+
+        # item_id = int(resource_url.split("/")[-1])
+        # site_name = resource_url.split("/")[-2]
+        # if site_name == "master":
+        #     site_path = site_name
+        # else:
+        #     site_path = resource_url.split("/")[-3] + "/" + site_name
+        return content
+
     def export_site_contents(
-        self, site_path=None, export_folder="./", name_trim=70, verbose=False
+        self,
+        site_path=None,
+        export_folder="./",
+        name_trim=100,
+        verbose=False,
+        include_site_folder=True,
+        include_item_ids=True,
     ):
         """export contents of site
         Originally here:
@@ -483,34 +507,48 @@ class BESConnection:
                     )
 
                 # Get Specific Content
-                content = self.get(
-                    item.attrib["Resource"].replace("http://", "https://")
-                )
+                content = self.get_content_by_resource(item.attrib["Resource"])
+
+                if not content:
+                    continue
 
                 # Write Content to Disk
-                if content:
-                    if not os.path.exists(
-                        export_folder + "%s/%s" % sanitize_txt(site_path, item.tag)
-                    ):
-                        os.makedirs(
-                            export_folder + "%s/%s" % sanitize_txt(site_path, item.tag)
-                        )
+                item_folder = export_folder + "%s/%s" % sanitize_txt(
+                    site_path, item.tag
+                )
+                if not include_site_folder:
+                    item_folder = export_folder + "%s" % sanitize_txt(item.tag)
+                if not os.path.exists(item_folder):
+                    os.makedirs(item_folder)
 
-                    with open(
-                        export_folder
-                        + "%s/%s/%s - %s.bes"
-                        % sanitize_txt(
-                            site_path,
+                item_path = export_folder + "%s/%s/%s-%s.bes" % sanitize_txt(
+                    site_path,
+                    item.tag,
+                    item.ID,
+                    item.Name.text[:name_trim],
+                )
+                if not include_item_ids:
+                    item_path = export_folder + "%s/%s/%s.bes" % sanitize_txt(
+                        site_path,
+                        item.tag,
+                        item.Name.text[:name_trim],
+                    )
+                if not include_site_folder:
+                    item_path = export_folder + "%s/%s-%s.bes" % sanitize_txt(
+                        item.tag,
+                        item.ID,
+                        item.Name.text[:name_trim],
+                    )
+                    if not include_item_ids:
+                        item_path = export_folder + "%s/%s.bes" % sanitize_txt(
                             item.tag,
-                            item.ID,
-                            # http://stackoverflow.com/questions/2872512/python-truncate-a-long-string
-                            # trimming to 150 worked in most cases, but recently even that had issues.
-                            # now trimmed to first name_trim characters of the title of the item.
                             item.Name.text[:name_trim],
-                        ),
-                        "wb",
-                    ) as bes_file:
-                        bes_file.write(content.text.encode("utf-8"))
+                        )
+                with open(
+                    item_path,
+                    "wb",
+                ) as bes_file:
+                    bes_file.write(content.text.encode("utf-8"))
 
     def export_all_sites(
         self, include_external=False, export_folder="./", name_trim=70, verbose=False

@@ -313,9 +313,15 @@ class BESCLInterface(Cmd):
             f"New Site Path: `{ self.bes_conn.set_current_site_path(statement) }`"
         )
 
+    def do_get_content(self, resource_url):
+        """get a specific item by resource url"""
+        print(self.bes_conn.get_content_by_resource(resource_url))
+
     def do_export_site(self, site_path):
         """export site contents to current folder"""
-        self.bes_conn.export_site_contents(site_path, verbose=True)
+        self.bes_conn.export_site_contents(
+            site_path, verbose=True, include_site_folder=False, include_item_ids=False
+        )
 
     def do_export_all_sites(self, statement=None):
         """export site contents to current folder"""
