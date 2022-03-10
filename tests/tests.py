@@ -63,6 +63,8 @@ bigfix_cli.do_conf()
 if bigfix_cli.bes_conn:
     print(bigfix_cli.bes_conn.session_relevance_string("number of bes computers"))
 
+    bigfix_cli.do_set_current_site("master")
+
     # set working directory to folder this file is in:
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 

@@ -12,6 +12,7 @@ import datetime
 import json
 import logging
 import os
+import random
 import site
 import string
 
@@ -28,6 +29,16 @@ from pkg_resources import resource_filename
 
 logging.basicConfig(level=logging.WARNING)
 besapi_logger = logging.getLogger("besapi")
+
+
+def rand_password(length=20):
+    """get a random password"""
+
+    all_safe_chars = string.ascii_letters + string.digits + "!#()*+,-.:;<=>?[]^_|~"
+
+    # https://medium.com/analytics-vidhya/create-a-random-password-generator-using-python-2fea485e9da9
+    password = "".join(random.sample(all_safe_chars, length))
+    return password
 
 
 def sanitize_txt(*args):
@@ -269,33 +280,44 @@ class BESConnection:
         self.session.cookies.clear()
         self.session.close()
 
-    def validate_site_path(self, site_path, site_must_exist=True):
+    def validate_site_path(self, site_path, check_site_exists=True, raise_error=False):
         """make sure site_path is valid"""
 
         if site_path is None:
+            if not raise_error:
+                return None
             raise ValueError("Site Path is `None` - NoneType Error")
         if str(site_path).strip() == "":
+            if not raise_error:
+                return None
             raise ValueError("Site Path is empty!")
 
+        # options for valid site prefix: (master must be last, special case)
         site_prefixes = ["external/", "custom/", "operator/", "master"]
 
         for prefix in site_prefixes:
             if prefix in site_path:
                 if prefix == "master" and prefix != site_path:
+                    # Invalid: This error should be raised regardless
                     raise ValueError(
                         f"Site path for master actionsite must be `master` not `{site_path}`"
                     )
-                if not site_must_exist:
+                if not check_site_exists:
                     # don't check if site exists first
                     return site_path
                 else:
                     # check site exists first
                     site_result = self.get(f"site/{site_path}")
                     if site_result.request.status_code != 200:
+                        if not raise_error:
+                            return None
+
                         raise ValueError(f"Site at path `{site_path}` does not exist!")
 
+                    # site_path is valid and exists:
                     return site_path
 
+        # Invalid: No valid prefix found
         raise ValueError(
             f"Site Path does not start with a valid prefix! {site_prefixes}"
         )
@@ -313,7 +335,7 @@ class BESConnection:
             raise ValueError("Site Path context not set and Site Path not provided!")
 
         # don't check for site's existence when doing basic get
-        return self.validate_site_path(site_path, site_must_exist=False)
+        return self.validate_site_path(site_path, check_site_exists=False)
 
     def set_current_site_path(self, site_path):
         """set current site path context"""
