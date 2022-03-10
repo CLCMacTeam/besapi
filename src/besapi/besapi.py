@@ -190,7 +190,9 @@ class BESConnection:
 
     def get(self, path="help", **kwargs):
         """HTTP GET request"""
-        self.login()
+        # avoid infinite loop:
+        if "login" not in path:
+            self.login()
         self.last_connected = datetime.datetime.now()
         return RESTResult(
             self.session.get(self.url(path), verify=self.verify, **kwargs)
