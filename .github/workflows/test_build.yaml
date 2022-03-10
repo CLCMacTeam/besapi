@@ -26,7 +26,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         # https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json
         python-version: ["3.6", "3"]
     steps:
