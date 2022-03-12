@@ -88,6 +88,14 @@ def elem2dict(node):
     return result
 
 
+# https://stackoverflow.com/questions/16159969/replace-all-text-between-2-strings-python
+def replace_text_between(originalText, delimeterA, delimterB, replacementText):
+    leadingText = originalText.split(delimeterA)[0]
+    trailingText = originalText.split(delimterB)[1]
+
+    return leadingText + delimeterA + replacementText + delimterB + trailingText
+
+
 # # https://docs.python-requests.org/en/latest/user/advanced/#transport-adapters
 # class HTTPAdapterBiggerBlocksize(requests.adapters.HTTPAdapter):
 #     """custom HTTPAdapter for requests to override blocksize
@@ -448,6 +456,13 @@ class BESConnection:
         headers = {"Content-Disposition": f'attachment; filename="{file_name}"'}
         with open(file_path, "rb") as f:
             return self.post(self.url("upload"), data=f, headers=headers)
+
+    def parse_upload_result_to_prefetch(self, result_upload, use_localhost=True):
+        """take a rest response from an upload and parse into prefetch"""
+        file_url = str(result_upload.besobj.FileUpload.URL)
+        if use_localhost:
+            file_url = replace_text_between(file_url, "://", ":52311", "localhost")
+        return f"prefetch {str(result_upload.besobj.FileUpload.Name).rsplit('/', 1)[-1]} sha1:{result_upload.besobj.FileUpload.SHA1} size:{int(result_upload.besobj.FileUpload.Size)} {file_url} sha256:{result_upload.besobj.FileUpload.SHA256}"
 
     def get_content_by_resource(self, resource_url):
         """get a single content item by resource"""

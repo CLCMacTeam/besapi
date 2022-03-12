@@ -301,6 +301,16 @@ class BESCLInterface(Cmd):
         """output version of besapi"""
         self.poutput(f"besapi version: {__version__}")
 
+    def do_get_action(self, statement=None):
+        """usage: get_action 123"""
+        result_op = self.bes_conn.get(f"action/{statement}")
+        self.poutput(result_op)
+
+    def do_get_operator(self, statement=None):
+        """usage: get_operator ExampleOperatorName"""
+        result_op = self.bes_conn.get_user(statement)
+        self.poutput(result_op)
+
     def do_get_current_site(self, statement=None):
         """output current site path context"""
         self.poutput(
@@ -334,7 +344,9 @@ class BESCLInterface(Cmd):
         if not os.access(file_path, os.R_OK):
             print(file_path, "is not a readable file")
         else:
-            print(self.bes_conn.upload(file_path))
+            upload_result = self.bes_conn.upload(file_path)
+            print(upload_result)
+            print(self.bes_conn.parse_upload_result_to_prefetch(upload_result))
 
     complete_create_group = Cmd.path_complete
 
