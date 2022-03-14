@@ -89,11 +89,20 @@ def elem2dict(node):
 
 
 # https://stackoverflow.com/questions/16159969/replace-all-text-between-2-strings-python
-def replace_text_between(originalText, delimeterA, delimterB, replacementText):
-    leadingText = originalText.split(delimeterA)[0]
-    trailingText = originalText.split(delimterB)[1]
+def replace_text_between(
+    original_text, first_delimiter, second_delimiter, replacement_text
+):
+    """Replace text between delimeters. Each delimiter should only appear once."""
+    leading_text = original_text.split(first_delimiter)[0]
+    trailing_text = original_text.split(second_delimiter)[1]
 
-    return leadingText + delimeterA + replacementText + delimterB + trailingText
+    return (
+        leading_text
+        + first_delimiter
+        + replacement_text
+        + second_delimiter
+        + trailing_text
+    )
 
 
 # # https://docs.python-requests.org/en/latest/user/advanced/#transport-adapters
@@ -141,6 +150,8 @@ class BESConnection:
         if not verify:
             # disable SSL warnings
             requests.packages.urllib3.disable_warnings()  # pylint: disable=no-member
+        self.verify = verify
+        self.last_connected = None
 
         self.username = username
         self.session = requests.Session()
@@ -159,8 +170,12 @@ class BESConnection:
             rootserver = rootserver + ":52311"
 
         self.rootserver = rootserver
-        self.verify = verify
-        self.last_connected = None
+        try:
+            # get root server port
+            self.rootserver_port = int(rootserver.split("://", 1)[1].split(":", 1)[1])
+        except BaseException:
+            # if error, assume default
+            self.rootserver_port = 52311
 
         self.login()
 
@@ -277,6 +292,9 @@ class BESConnection:
                 self.last_connected,
                 duration_minutes,
             )
+            # default timeout is 5 minutes
+            # I'm not sure if this is required
+            # or if 'requests' would handle this automatically anyway
             if int(duration_minutes) > 3:
                 besapi_logger.info("Refreshing Login to prevent timeout.")
                 self.last_connected = None
