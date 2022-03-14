@@ -475,12 +475,28 @@ class BESConnection:
         with open(file_path, "rb") as f:
             return self.post(self.url("upload"), data=f, headers=headers)
 
-    def parse_upload_result_to_prefetch(self, result_upload, use_localhost=True):
+    def parse_upload_result_to_prefetch(
+        self, result_upload, use_localhost=True, use_https=True
+    ):
         """take a rest response from an upload and parse into prefetch"""
         file_url = str(result_upload.besobj.FileUpload.URL)
+        if use_https:
+            file_url = file_url.replace("http://", "https://")
+        # there are 3 different posibilities for the server FQDN
+        # localhost
+        # self.rootserver (without port number)
+        # the returned value from the upload result
         if use_localhost:
-            file_url = replace_text_between(file_url, "://", ":52311", "localhost")
-        return f"prefetch {str(result_upload.besobj.FileUpload.Name).rsplit('/', 1)[-1]} sha1:{result_upload.besobj.FileUpload.SHA1} size:{int(result_upload.besobj.FileUpload.Size)} {file_url} sha256:{result_upload.besobj.FileUpload.SHA256}"
+            file_url = replace_text_between(
+                file_url, "://", ":" + str(self.rootserver_port), "localhost"
+            )
+
+        # get tail of `Name` in FileUpload Result
+        file_name = str(result_upload.besobj.FileUpload.Name).rsplit("/", 1)[-1]
+        file_size = int(result_upload.besobj.FileUpload.Size)
+        file_sha1 = result_upload.besobj.FileUpload.SHA1
+        file_sha256 = result_upload.besobj.FileUpload.SHA256
+        return f"prefetch {file_name} sha1:{file_sha1} size:{file_size} {file_url} sha256:{file_sha256}"
 
     def get_content_by_resource(self, resource_url):
         """get a single content item by resource"""

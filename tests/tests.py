@@ -27,6 +27,14 @@ import besapi
 
 print("besapi version: " + str(besapi.__version__))
 
+assert 15 == len(besapi.besapi.rand_password(15))
+
+assert ("test--string", "test") == besapi.besapi.sanitize_txt(r"test/\string", "test%")
+
+assert "http://localhost:52311/file.example" == besapi.besapi.replace_text_between(
+    "http://example:52311/file.example", "://", ":52311", "localhost"
+)
+
 # test site_path string validation
 assert "master" in besapi.besapi.BESConnection.validate_site_path("", "master", False)
 assert "custom/" in besapi.besapi.BESConnection.validate_site_path(
@@ -113,7 +121,11 @@ if bigfix_cli.bes_conn:
     os.chdir("../src")
 
     # Test file upload:
-    print(bigfix_cli.bes_conn.upload("./besapi/__init__.py", "test_besapi_upload.txt"))
+    upload_result = bigfix_cli.bes_conn.upload(
+        "./besapi/__init__.py", "test_besapi_upload.txt"
+    )
+    print(upload_result)
+    print(bigfix_cli.bes_conn.parse_upload_result_to_prefetch(upload_result))
 
     if os.name == "nt":
         subprocess.run(
