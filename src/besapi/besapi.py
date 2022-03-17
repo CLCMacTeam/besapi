@@ -517,10 +517,11 @@ class BESConnection:
         include_item_type_folder=False,
         include_item_id=False,
     ):
-        """export a single item by resource"""
-        if "http" not in content_resource:
-            besapi_logger.warning("Improper resource provided")
-            return None
+        """export a single item by resource
+        example resources:
+         - content_type/site_type/site/id
+         - https://localhost:52311/api/content_type/site_type/site/id
+        """
 
         # Get Specific Content
         content = self.get_content_by_resource(content_resource)
