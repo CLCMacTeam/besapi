@@ -48,6 +48,16 @@ class BESCLInterface(Cmd):
 
     def do_get(self, line):
         """Perform get request to BigFix server using provided api endpoint argument"""
+
+        # Remove root server prefix:
+        # if root server prefix is not removed
+        # and root server is given as IP Address,
+        # then `robjs` will not work
+        if "/api/" in line:
+            line = str(line).split("/api/", 1)[1]
+            self.pfeedback("get " + line)
+
+        # allow use of `get resource/path.obj_attribute.attribute`
         robjs = line.split(".")
 
         if self.bes_conn:
@@ -326,6 +336,10 @@ class BESCLInterface(Cmd):
     def do_get_content(self, resource_url):
         """get a specific item by resource url"""
         print(self.bes_conn.get_content_by_resource(resource_url))
+
+    def do_export_item_by_resource(self, statement):
+        """export content itemb to current folder"""
+        print(self.bes_conn.export_item_by_resource(statement))
 
     def do_export_site(self, site_path):
         """export site contents to current folder"""

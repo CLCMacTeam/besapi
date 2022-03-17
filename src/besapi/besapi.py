@@ -213,9 +213,6 @@ class BESConnection:
 
     def get(self, path="help", **kwargs):
         """HTTP GET request"""
-        # avoid infinite loop:
-        if "login" not in path:
-            self.login()
         self.last_connected = datetime.datetime.now()
         return RESTResult(
             self.session.get(self.url(path), verify=self.verify, **kwargs)
@@ -223,7 +220,6 @@ class BESConnection:
 
     def post(self, path, data, **kwargs):
         """HTTP POST request"""
-        self.login()
         self.last_connected = datetime.datetime.now()
         return RESTResult(
             self.session.post(self.url(path), data=data, verify=self.verify, **kwargs)
@@ -231,7 +227,6 @@ class BESConnection:
 
     def put(self, path, data, **kwargs):
         """HTTP PUT request"""
-        self.login()
         self.last_connected = datetime.datetime.now()
         return RESTResult(
             self.session.put(self.url(path), data=data, verify=self.verify, **kwargs)
@@ -239,7 +234,6 @@ class BESConnection:
 
     def delete(self, path, **kwargs):
         """HTTP DELETE request"""
-        self.login()
         self.last_connected = datetime.datetime.now()
         return RESTResult(
             self.session.delete(self.url(path), verify=self.verify, **kwargs)
@@ -247,7 +241,6 @@ class BESConnection:
 
     def session_relevance_xml(self, relevance, **kwargs):
         """Get Session Relevance Results XML"""
-        self.login()
         self.last_connected = datetime.datetime.now()
         return RESTResult(
             self.session.post(
@@ -515,6 +508,52 @@ class BESConnection:
         # else:
         #     site_path = resource_url.split("/")[-3] + "/" + site_name
         return content
+
+    def export_item_by_resource(
+        self,
+        content_resource,
+        export_folder="./",
+        name_trim=100,
+        include_item_type_folder=False,
+        include_item_id=False,
+    ):
+        """export a single item by resource"""
+        if "http" not in content_resource:
+            besapi_logger.warning("Improper resource provided")
+            return None
+
+        # Get Specific Content
+        content = self.get_content_by_resource(content_resource)
+        if not content:
+            besapi_logger.warning("Content not found")
+            return None
+
+        # get first tag in XML that is the Type
+        content_type_tag = list(content.besobj.__dict__.keys())[0]
+        item_id = int(content_resource.split("/")[-1])
+        item = content.besobj[content_type_tag]
+        # print(item.__dict__.keys())
+        item_folder = export_folder
+        if include_item_type_folder:
+            item_folder = export_folder + "%s" % sanitize_txt(content_type_tag)
+        # print(item_folder)
+        if not os.path.exists(item_folder):
+            os.makedirs(item_folder)
+        item_path = item_folder + "/%s.bes" % sanitize_txt(
+            item.Title.text[:name_trim],
+        )
+        if include_item_id:
+            item_path = item_folder + "/%s-%s.bes" % sanitize_txt(
+                item_id,
+                item.Title.text[:name_trim],
+            )
+        item_path = item_path.replace("//", "/")
+        with open(
+            item_path,
+            "wb",
+        ) as bes_file:
+            bes_file.write(content.text.encode("utf-8"))
+        return item_path
 
     def export_site_contents(
         self,
