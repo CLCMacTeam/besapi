@@ -105,6 +105,13 @@ def replace_text_between(
     )
 
 
+# https://github.com/jgstew/generate_bes_from_template/blob/bcc6c79632dd375c2861608ded3ae5872801a669/src/generate_bes_from_template/generate_bes_from_template.py#L87-L92
+def parse_bes_modtime(string_datetime):
+    """parse datetime string to object"""
+    # ("%a, %d %b %Y %H:%M:%S %z")
+    return datetime.datetime.strptime(string_datetime, "%a, %d %b %Y %H:%M:%S %z")
+
+
 # # https://docs.python-requests.org/en/latest/user/advanced/#transport-adapters
 # class HTTPAdapterBiggerBlocksize(requests.adapters.HTTPAdapter):
 #     """custom HTTPAdapter for requests to override blocksize
@@ -257,15 +264,20 @@ class BESConnection:
         # print(rel_result)
         result = []
         try:
-            for item in rel_result.objectify_text(rel_result.text).Query.Result.Answer:
+            for item in rel_result.besobj.Query.Result.Answer:
                 result.append(item.text)
         except AttributeError as err:
             # print(err)
             if "no such child: Answer" in str(err):
-                result.append(
-                    "ERROR: "
-                    + rel_result.objectify_text(rel_result.text).Query.Error.text
-                )
+                try:
+                    result.append("ERROR: " + rel_result.besobj.Query.Error.text)
+                except AttributeError as err:
+                    if "no such child: Error" in str(err):
+                        result.append("<Nothing> Nothing returned, but no error.")
+                        besapi_logger.info("Query did not return any results")
+                    else:
+                        besapi_logger.error("%s\n%s", err, rel_result.text)
+                        raise
             else:
                 raise
         return result
@@ -508,6 +520,53 @@ class BESConnection:
         # else:
         #     site_path = resource_url.split("/")[-3] + "/" + site_name
         return content
+
+    def update_item_from_file(self, file_path, site_path=None):
+        """update an item by name and last modified"""
+        site_path = self.get_current_site_path(site_path)
+        bes_tree = etree.parse(file_path)
+        # get name of first child tag of BES
+        # - https://stackoverflow.com/a/3601919/861745
+        bes_type = str(bes_tree.xpath("name(/BES/*[1])"))
+        bes_title = bes_tree.xpath("/BES/*[1]/Title/text()")[0]
+        # get last modification time:
+        bes_last_mod = bes_tree.xpath(
+            '/BES/*[1]/MIMEField[Name[contains(text(), "x-fixlet-modification-time")]]/Value/text()'
+        )[0]
+        bes_last_mod_obj = parse_bes_modtime(bes_last_mod)
+
+        print(bes_title)
+        print(bes_type)
+        print(bes_last_mod)
+        print(bes_last_mod_obj)
+
+        return "WORK IN PROGRESS: besapi.update_item_from_file()"
+
+    def save_item_to_besfile(
+        self,
+        xml_string,
+        export_folder="./",
+        name_trim=100,
+    ):
+        """save an xml string to bes file"""
+        item_folder = export_folder
+        if not os.path.exists(item_folder):
+            os.makedirs(item_folder)
+
+        content_obj = RESTResult.objectify_text(None, xml_string)
+        # get first tag in XML that is the Type
+        content_type_tag = list(content_obj.__dict__.keys())[0]
+        item = content_obj[content_type_tag]
+        item_path = item_folder + "/%s.bes" % sanitize_txt(
+            item.Title.text[:name_trim],
+        )
+        item_path = item_path.replace("//", "/")
+        with open(
+            item_path,
+            "wb",
+        ) as bes_file:
+            bes_file.write(xml_string.encode("utf-8"))
+        return item_path
 
     def export_item_by_resource(
         self,

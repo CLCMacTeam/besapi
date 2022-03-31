@@ -75,6 +75,11 @@ class BESCLInterface(Cmd):
         else:
             self.pfeedback("Not currently logged in. Type 'login'.")
 
+    def do_post(self, statement):
+        """post file as data to path"""
+        print(statement)
+        print("not yet implemented")
+
     def do_config(self, conf_file=None):
         """Attempt to load config info from file and login"""
         self.do_conf(conf_file)
@@ -303,9 +308,10 @@ class BESCLInterface(Cmd):
             if statement.raw:
                 # get everything after `query `
                 rel_text = statement.raw.split(" ", 1)[1]
-                self.poutput(f"Q: {rel_text}")
+                self.pfeedback(f"Q: {rel_text}")
                 rel_result = self.bes_conn.session_relevance_string(rel_text)
-                self.poutput(f"A: {rel_result}")
+                self.pfeedback("A: ")
+                self.poutput(rel_result)
 
     def do_version(self, statement=None):
         """output version of besapi"""
@@ -388,6 +394,15 @@ class BESCLInterface(Cmd):
             print(file_path, "is not a readable file")
         else:
             print(self.bes_conn.create_site_from_file(file_path))
+
+    complete_update_item = Cmd.path_complete
+
+    def do_update_item(self, file_path):
+        """update bigfix content item from bes file"""
+        if not os.access(file_path, os.R_OK):
+            print(file_path, "is not a readable file")
+        else:
+            print(self.bes_conn.update_item_from_file(file_path))
 
 
 def main():
