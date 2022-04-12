@@ -14,7 +14,7 @@ setup(
     author="Matt Hansen, James Stewart",
     author_email="hansen.m@psu.edu, james@jgstew.com",
     description="Library for working with the BigFix REST API",
-    license="BSD",
+    license="MIT",
     keywords="bigfix iem tem rest api",
     url="https://github.com/CLCMacTeam/besapi",
     # long_description= moved to setup.cfg
@@ -23,5 +23,4 @@ setup(
     install_requires=["requests", "lxml", "cmd2"],
     include_package_data=True,
     package_dir={"": "src"},
-    # install_requires={':python_version < "3.0"': ["future-fstrings",],},
 )

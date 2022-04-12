@@ -26,9 +26,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         # https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json
-        python-version: ["3.8"]
+        python-version: ["3.6", "3"]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install build tools
-        run: pip install setuptools wheel build
+        run: pip install setuptools wheel build pyinstaller
       - name: Install requirements
         run: if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Run Tests - Source
@@ -58,6 +58,10 @@ jobs:
         run: python -c "import bescli"
       - name: Test python bescli
         shell: bash
-        run: python -m bescli ls logout clear error_count exit
+        run: python -m bescli ls logout clear error_count version exit
       - name: Run Tests - Pip
         run: python tests/tests.py --test_pip
+      - name: Test pyinstaller
+        run: pyinstaller --clean --collect-all besapi --onefile ./src/bescli/bescli.py
+      - name: Test bescli binary
+        run: ./dist/bescli ls logout clear error_count version exit

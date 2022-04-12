@@ -2,23 +2,21 @@
 """
 bescli.py
 
-Created by Matt Hansen (mah60@psu.edu) on 2014-07-21.
+MIT License
+Copyright (c) 2014 Matt Hansen
+Maintained by James Stewart since 2021
 
 Simple command line interface for the BES (BigFix) REST API.
 """
 
 import getpass
+import logging
 import os
 import site
-import sys
+from configparser import ConfigParser as SafeConfigParser
 
 import requests.exceptions
 from cmd2 import Cmd
-
-try:
-    from ConfigParser import SafeConfigParser
-except (ImportError, ModuleNotFoundError):
-    from configparser import SafeConfigParser
 
 try:
     from besapi import besapi
@@ -52,6 +50,16 @@ class BESCLInterface(Cmd):
 
     def do_get(self, line):
         """Perform get request to BigFix server using provided api endpoint argument"""
+
+        # Remove root server prefix:
+        # if root server prefix is not removed
+        # and root server is given as IP Address,
+        # then `robjs` will not work
+        if "/api/" in line:
+            line = str(line).split("/api/", 1)[1]
+            self.pfeedback("get " + line)
+
+        # allow use of `get resource/path.obj_attribute.attribute`
         robjs = line.split(".")
 
         if self.bes_conn:
@@ -64,8 +72,15 @@ class BESCLInterface(Cmd):
                 output_item = self.bes_conn.get(line)
                 # print(type(output_item))
                 print(output_item)
+                # print(output_item.besdict)
+                # print(output_item.besjson)
         else:
             self.pfeedback("Not currently logged in. Type 'login'.")
+
+    def do_post(self, statement):
+        """post file as data to path"""
+        print(statement)
+        print("not yet implemented")
 
     def do_config(self, conf_file=None):
         """Attempt to load config info from file and login"""
@@ -120,15 +135,12 @@ class BESCLInterface(Cmd):
 
     def do_login(self, user=None):
         """Login to BigFix Server"""
-        # python3 hack:
-        if sys.version_info >= (3, 0):
-            raw_input = input
 
         if not user:
             if self.BES_USER_NAME:
                 user = self.BES_USER_NAME
             else:
-                user = raw_input("User [%s]: " % getpass.getuser())
+                user = str(input("User [%s]: " % getpass.getuser()))
                 if not user:
                     user = getpass.getuser()
 
@@ -140,13 +152,13 @@ class BESCLInterface(Cmd):
         if self.BES_ROOT_SERVER:
             root_server = self.BES_ROOT_SERVER
             if not root_server:
-                root_server = raw_input("Root Server [%s]: " % self.BES_ROOT_SERVER)
+                root_server = str(input("Root Server [%s]: " % self.BES_ROOT_SERVER))
 
             self.BES_ROOT_SERVER = root_server
 
         else:
-            root_server = raw_input(
-                "Root Server (ex. %s): " % "https://server.institution.edu:52311"
+            root_server = str(
+                input("Root Server (ex. %s): " % "https://server.institution.edu:52311")
             )
             if root_server:
                 self.BES_ROOT_SERVER = root_server
@@ -165,7 +177,7 @@ class BESCLInterface(Cmd):
         if self.BES_USER_NAME and self.BES_ROOT_SERVER and self.BES_PASSWORD:
             try:
                 self.bes_conn = besapi.BESConnection(
-                    user, self.BES_PASSWORD, root_server
+                    self.BES_USER_NAME, self.BES_PASSWORD, self.BES_ROOT_SERVER
                 )
                 if self.bes_conn.login():
                     self.pfeedback("Login Successful!")
@@ -204,7 +216,8 @@ class BESCLInterface(Cmd):
         """Logout and clear session"""
         if self.bes_conn:
             self.bes_conn.logout()
-            self.bes_conn = None
+            # del self.bes_conn
+            # self.bes_conn = None
         self.pfeedback("Logout Complete!")
 
     def do_debug(self, setting):
@@ -214,12 +227,16 @@ class BESCLInterface(Cmd):
         self.echo = bool(setting)
         self.quiet = bool(setting)
         self.timing = bool(setting)
+        if bool(setting):
+            logging.getLogger("besapi").setLevel(logging.DEBUG)
+        else:
+            logging.getLogger("besapi").setLevel(logging.WARNING)
 
     def do_clear(self, arg=None):
         """clear current config and logout"""
         if self.bes_conn:
             self.bes_conn.logout()
-            self.bes_conn = None
+            # self.bes_conn = None
         if arg and "root" in arg.lower():
             self.pfeedback(" - clearing root server parameter -")
             self.BES_ROOT_SERVER = None
@@ -257,16 +274,21 @@ class BESCLInterface(Cmd):
 
     def do_ls(self, arg=None):
         """List the current settings and connection status"""
+        print("        Connected: " + str(bool(self.bes_conn)))
         print(
-            "BES_ROOT_SERVER: " + (self.BES_ROOT_SERVER if self.BES_ROOT_SERVER else "")
+            "  BES_ROOT_SERVER: "
+            + (self.BES_ROOT_SERVER if self.BES_ROOT_SERVER else "")
         )
-        print("  BES_USER_NAME: " + (self.BES_USER_NAME if self.BES_USER_NAME else ""))
         print(
-            "Password Length: "
+            "    BES_USER_NAME: " + (self.BES_USER_NAME if self.BES_USER_NAME else "")
+        )
+        print(
+            "  Password Length: "
             + str(len(self.BES_PASSWORD if self.BES_PASSWORD else ""))
         )
-        print("      Connected: " + str(bool(self.bes_conn)))
-        print("Config File Path: " + self.conf_path)
+        print(" Config File Path: " + self.conf_path)
+        if self.bes_conn:
+            print("Current Site Path: " + self.bes_conn.get_current_site_path(None))
 
     def do_error_count(self, arg=None):
         """Output the number of errors"""
@@ -288,17 +310,54 @@ class BESCLInterface(Cmd):
             if statement.raw:
                 # get everything after `query `
                 rel_text = statement.raw.split(" ", 1)[1]
-                self.poutput(f"Q: {rel_text}")
+                self.pfeedback(f"Q: {rel_text}")
                 rel_result = self.bes_conn.session_relevance_string(rel_text)
-                self.poutput(f"A: {rel_result}")
+                self.pfeedback("A: ")
+                self.poutput(rel_result)
 
     def do_version(self, statement=None):
         """output version of besapi"""
         self.poutput(f"besapi version: {__version__}")
 
+    def do_get_action(self, statement=None):
+        """usage: get_action 123"""
+        result_op = self.bes_conn.get(f"action/{statement}")
+        self.poutput(result_op)
+
+    def do_get_operator(self, statement=None):
+        """usage: get_operator ExampleOperatorName"""
+        result_op = self.bes_conn.get_user(statement)
+        self.poutput(result_op)
+
+    def do_get_current_site(self, statement=None):
+        """output current site path context"""
+        self.poutput(
+            f"Current Site Path: `{ self.bes_conn.get_current_site_path(None) }`"
+        )
+
+    def do_set_current_site(self, statement=None):
+        """set current site path context"""
+        self.poutput(
+            f"New Site Path: `{ self.bes_conn.set_current_site_path(statement) }`"
+        )
+
+    def do_get_content(self, resource_url):
+        """get a specific item by resource url"""
+        print(self.bes_conn.get_content_by_resource(resource_url))
+
+    def do_export_item_by_resource(self, statement):
+        """export content itemb to current folder"""
+        print(self.bes_conn.export_item_by_resource(statement))
+
     def do_export_site(self, site_path):
         """export site contents to current folder"""
-        self.bes_conn.export_site_contents(site_path, verbose=True)
+        self.bes_conn.export_site_contents(
+            site_path, verbose=True, include_site_folder=False, include_item_ids=False
+        )
+
+    def do_export_all_sites(self, statement=None):
+        """export site contents to current folder"""
+        self.bes_conn.export_all_sites(verbose=False)
 
     complete_upload = Cmd.path_complete
 
@@ -307,7 +366,45 @@ class BESCLInterface(Cmd):
         if not os.access(file_path, os.R_OK):
             print(file_path, "is not a readable file")
         else:
-            print(self.bes_conn.upload(file_path))
+            upload_result = self.bes_conn.upload(file_path)
+            print(upload_result)
+            print(self.bes_conn.parse_upload_result_to_prefetch(upload_result))
+
+    complete_create_group = Cmd.path_complete
+
+    def do_create_group(self, file_path):
+        """create bigfix group from bes file"""
+        if not os.access(file_path, os.R_OK):
+            print(file_path, "is not a readable file")
+        else:
+            print(self.bes_conn.create_group_from_file(file_path))
+
+    complete_create_user = Cmd.path_complete
+
+    def do_create_user(self, file_path):
+        """create bigfix user from bes file"""
+        if not os.access(file_path, os.R_OK):
+            print(file_path, "is not a readable file")
+        else:
+            print(self.bes_conn.create_user_from_file(file_path))
+
+    complete_create_site = Cmd.path_complete
+
+    def do_create_site(self, file_path):
+        """create bigfix site from bes file"""
+        if not os.access(file_path, os.R_OK):
+            print(file_path, "is not a readable file")
+        else:
+            print(self.bes_conn.create_site_from_file(file_path))
+
+    complete_update_item = Cmd.path_complete
+
+    def do_update_item(self, file_path):
+        """update bigfix content item from bes file"""
+        if not os.access(file_path, os.R_OK):
+            print(file_path, "is not a readable file")
+        else:
+            print(self.bes_conn.update_item_from_file(file_path))
 
 
 def main():

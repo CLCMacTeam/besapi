@@ -24,10 +24,72 @@ if not args.test_pip:
     sys.path.reverse()
 
 import besapi
-import bescli
-
 
 print("besapi version: " + str(besapi.__version__))
+
+assert 15 == len(besapi.besapi.rand_password(15))
+
+assert ("test--string", "test") == besapi.besapi.sanitize_txt(r"test/\string", "test%")
+
+assert "http://localhost:52311/file.example" == besapi.besapi.replace_text_between(
+    "http://example:52311/file.example", "://", ":52311", "localhost"
+)
+
+# test site_path string validation
+assert "master" in besapi.besapi.BESConnection.validate_site_path("", "master", False)
+assert "custom/" in besapi.besapi.BESConnection.validate_site_path(
+    "", "custom/Example", False
+)
+assert "operator/" in besapi.besapi.BESConnection.validate_site_path(
+    "", "operator/Example", False
+)
+
+# start failing tests:
+raised_errors = 0
+
+# failing test:
+try:
+    besapi.besapi.BESConnection.validate_site_path("", "bad/Example", False)
+except ValueError:
+    raised_errors += 1
+
+# failing test:
+try:
+    besapi.besapi.BESConnection.validate_site_path("", "bad/master", False)
+except ValueError:
+    raised_errors += 1
+
+# failing test:
+try:
+    besapi.besapi.BESConnection.validate_site_path("", "", False, True)
+except ValueError:
+    raised_errors += 1
+
+# failing test:
+try:
+    besapi.besapi.BESConnection.validate_site_path("", None, False, True)
+except ValueError:
+    raised_errors += 1
+
+assert raised_errors == 4
+# end failing tests
+
+
+class RequestResult(object):
+    text = "this is just a test"
+    headers = []
+
+
+request_result = RequestResult()
+rest_result = besapi.besapi.RESTResult(request_result)
+
+print(rest_result.besdict)
+print(rest_result.besjson)
+assert b"<BES>Example</BES>" in rest_result.xmlparse_text("<BES>Example</BES>")
+
+assert rest_result.text == "this is just a test"
+
+import bescli
 
 bigfix_cli = bescli.bescli.BESCLInterface()
 
@@ -42,7 +104,15 @@ bigfix_cli.do_conf()
 
 # this should really only run if the config file is present:
 if bigfix_cli.bes_conn:
+    # session relevance tests require functioning web reports server
     print(bigfix_cli.bes_conn.session_relevance_string("number of bes computers"))
+    assert (
+        "test session relevance string result"
+        in bigfix_cli.bes_conn.session_relevance_string(
+            '"test session relevance string result"'
+        )
+    )
+    bigfix_cli.do_set_current_site("master")
 
     # set working directory to folder this file is in:
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -50,7 +120,12 @@ if bigfix_cli.bes_conn:
     # set working directory to src folder in parent folder
     os.chdir("../src")
 
-    # Test file upload: print(bigfix_cli.bes_conn.upload("./besapi/__init__.py", "test_file.txt"))
+    # Test file upload:
+    upload_result = bigfix_cli.bes_conn.upload(
+        "./besapi/__init__.py", "test_besapi_upload.txt"
+    )
+    print(upload_result)
+    print(bigfix_cli.bes_conn.parse_upload_result_to_prefetch(upload_result))
 
     if os.name == "nt":
         subprocess.run(
