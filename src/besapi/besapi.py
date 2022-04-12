@@ -2,8 +2,9 @@
 """
 besapi.py
 
-Created by Matt Hansen (mah60@psu.edu) on 2014-03-20.
-Enhancements by James Stewart since 2021
+MIT License
+Copyright (c) 2014 Matt Hansen
+Maintained by James Stewart since 2021
 
 Library for communicating with the BES (BigFix) REST API.
 """
