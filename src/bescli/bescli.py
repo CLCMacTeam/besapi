@@ -2,7 +2,9 @@
 """
 bescli.py
 
-Created by Matt Hansen (mah60@psu.edu) on 2014-07-21.
+MIT License
+Copyright (c) 2014 Matt Hansen
+Maintained by James Stewart since 2021
 
 Simple command line interface for the BES (BigFix) REST API.
 """

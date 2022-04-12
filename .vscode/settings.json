@@ -7,5 +7,6 @@
   "python.autoComplete.addBrackets": true,
   "editor.formatOnSave": true,
   "git.autofetch": true,
-  "python.analysis.completeFunctionParens": true
+  "python.analysis.completeFunctionParens": true,
+  "python.linting.enabled": true
 }
