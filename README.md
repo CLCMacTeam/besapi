@@ -1,14 +1,13 @@
-besapi
-======
+# besapi
 
 besapi is a Python library designed to interact with the BigFix [REST API](https://developer.bigfix.com/rest-api/api/).
 
 Installation:
 
-```pip install besapi```
-
+`pip install besapi`
 
 Usage:
+
 ```
 import besapi
 b = besapi.BESConnection('my_username', 'my_password', 'https://rootserver.domain.org:52311')
@@ -21,6 +20,7 @@ rr = b.get('sites')
 
 >>>print rr
 ```
+
 ```xml
 <BESAPI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BESAPI.xsd">
 <ExternalSite Resource="http://rootserver.domain.org:52311/api/site/external/BES%20Support">
@@ -47,6 +47,7 @@ rr = b.get('sites')
 </ActionSite>
 </BESAPI>
 ```
+
 ```
 >>>rr.besobj.attrib
 {'{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation': 'BESAPI.xsd'}
@@ -82,9 +83,8 @@ ContentDev
 >>> b.put('task/operator/mah60/823975', file)
 ```
 
+# Command-Line Interface
 
-Command-Line Interface
-============
 ```
 $ python bescli.py
 OR
@@ -111,15 +111,12 @@ BES> get fixlets/operator/mah60
 ...
 ```
 
+# REST API Help
 
-REST API Help
-============
 - https://developer.bigfix.com/rest-api/
 - http://bigfix.me/restapi
 
-
-Requirements
-============
+# Requirements
 
 - Python 3.6 or later
   - version 1.1.3 of besapi was the last to have partial python2 support
@@ -127,15 +124,13 @@ Requirements
 - requests
 - cmd2
 
-
-Pyinstaller
-============
+# Pyinstaller
 
 - `pyinstaller --clean --collect-all besapi --onefile .\src\bescli\bescli.py`
 - Note: using UPX to compress the binary only saves 2MB out of 16MB on Windows
 
-Related Items
-=======
+# Related Items
+
 - https://forum.bigfix.com/t/rest-api-python-module/2170
 - https://gist.github.com/hansen-m/58667f370047af92f634
 - https://docs.google.com/presentation/d/1pME28wdjkzj9378py9QjFyMOyOHcamB6bk4k8z-c-r0/edit#slide=id.g69e753e75_039
@@ -143,7 +138,6 @@ Related Items
 - https://forum.bigfix.com/t/query-for-finding-who-deleted-tasks-fixlets/13668/6
 - https://forum.bigfix.com/t/rest-api-java-wrapper/12693
 
+# LICENSE
 
-LICENSE
-=======
-- GNU General Public License v2
+- MIT License
